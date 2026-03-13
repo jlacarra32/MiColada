@@ -1,44 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePrendas } from "@/hooks/usePrendas";
 import { useConfig } from "@/hooks/useConfig";
 import PrendaCard from "@/components/PrendaCard";
-import FAB from "@/components/FAB";
-import { WashingMachine, Settings, Search } from "lucide-react";
+import TimeAgoText from "@/components/TimeAgoText";
+import { WashingMachine, Settings, Search, CheckCircle2, Waves } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
 
-export default function ArmarioPage() {
-  const { prendas, isLoaded, sendToLaundry } = usePrendas();
+export default function LavanderiaPage() {
+  const { prendas, isLoaded, receiveFromLaundry } = usePrendas();
   const { tipos } = useConfig();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
-  const armarioPrendas = prendas.filter((p) => p.estado === "en_armario");
-
-  const toggleSelection = (id: string) => {
-    setSelectedIds((prev) => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-  };
-
-  const handleSendToLaundry = () => {
-    sendToLaundry(selectedIds);
-    setSelectedIds([]);
-  };
+  const lavanderiaPrendas = prendas.filter((p) => p.estado === "en_lavanderia")
+    .sort((a, b) => (b.fechaEnvio || 0) - (a.fechaEnvio || 0));
 
   if (!isLoaded) {
-    return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando armario...</div>;
+    return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando lavandería...</div>;
   }
 
   // Grupos por tipo
-  const groupedPrendas = armarioPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
+  const groupedPrendas = lavanderiaPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
     if (!acc[prenda.tipo]) acc[prenda.tipo] = [];
     acc[prenda.tipo].push(prenda);
     return acc;
   }, {});
 
-  // Ordenar grupos según el orden definido en 'tipos' (config)
+  // Ordenar categorías según config
   const sortedKeys = Object.keys(groupedPrendas).sort((a, b) => {
     const idxA = tipos.indexOf(a);
     const idxB = tipos.indexOf(b);
@@ -52,9 +40,9 @@ export default function ArmarioPage() {
     <div className="min-h-full p-4 pb-28 flex flex-col gap-4">
       <header className="mb-4 mt-6 px-2 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Mi Armario</h1>
-          <p className="text-cyan-200/80 font-bold text-xs uppercase tracking-widest mt-1">
-            {armarioPrendas.length} prenda{armarioPrendas.length !== 1 && 's'} limpia{armarioPrendas.length !== 1 && 's'}
+          <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Lavandería</h1>
+          <p className="text-emerald-300/80 font-bold text-xs uppercase tracking-widest mt-1">
+            {lavanderiaPrendas.length} prenda{lavanderiaPrendas.length !== 1 && 's'} lavándose
           </p>
         </div>
         <div className="flex gap-2">
@@ -67,17 +55,17 @@ export default function ArmarioPage() {
         </div>
       </header>
 
-      {armarioPrendas.length === 0 ? (
+      {lavanderiaPrendas.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center mt-12 p-6 text-center">
           <div className="relative mb-8 transition-transform hover:scale-105 duration-500">
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-blue-500 rounded-full blur-2xl opacity-40"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full blur-2xl opacity-40"></div>
             <div className="bg-white/10 p-6 rounded-full shadow-lg border border-white/10 relative backdrop-blur-md">
-              <WashingMachine size={72} strokeWidth={1} className="text-cyan-400/80" />
+              <Waves size={72} strokeWidth={1} className="text-emerald-400/80" />
             </div>
           </div>
-          <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">¡Tu armario está vacío!</p>
+          <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">¡Todo limpio y en su sitio!</p>
           <p className="text-base mt-3 text-zinc-400 max-w-[260px] leading-relaxed">
-            Añade ropa nueva o recibe la que ya enviaste a la lavandería.
+            No tienes ropa en la lavandería en este momento.
           </p>
         </div>
       ) : (
@@ -85,29 +73,33 @@ export default function ArmarioPage() {
           {sortedKeys.map((tipoKey) => (
             <div key={tipoKey} className="flex flex-col gap-4">
               <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
+                {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {groupedPrendas[tipoKey].map((prenda) => (
                   <PrendaCard
                     key={prenda.id}
                     prenda={prenda}
-                    selected={selectedIds.includes(prenda.id)}
-                    onClick={() => toggleSelection(prenda.id)}
-                  />
+                    actionButton={
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          receiveFromLaundry(prenda.id);
+                        }}
+                        className="w-full flex items-center justify-center gap-1.5 text-emerald-500 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[10px] uppercase tracking-wider"
+                      >
+                        <CheckCircle2 size={14} />
+                        Recibido
+                      </button>
+                    }
+                  >
+                    {prenda.fechaEnvio && <TimeAgoText timestamp={prenda.fechaEnvio} />}
+                  </PrendaCard>
                 ))}
               </div>
             </div>
           ))}
         </div>
-      )}
-
-      {selectedIds.length > 0 && (
-        <FAB 
-          label={`Enviar ${selectedIds.length} a lavar`}
-          onClick={handleSendToLaundry}
-          icon={<WashingMachine size={20} />}
-        />
       )}
     </div>
   );

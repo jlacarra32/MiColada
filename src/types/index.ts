@@ -7,5 +7,5 @@ export interface Prenda {
   detalle: string;
   estado: EstadoPrenda;
   fechaEnvio?: number;
-  cantidad?: number;
+  esMultiple?: boolean;  // Can send multiple units (bags) at once
 }

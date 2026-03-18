@@ -69,20 +69,20 @@ export default function LavanderiaPage() {
   }
 
   return (
-    <div className="min-h-full p-4 pb-28 flex flex-col gap-4">
-      <header className="mb-4 mt-6 px-2 flex justify-between items-end">
+    <div className="min-h-full p-3 pb-28 flex flex-col gap-3">
+      <header className="mb-2 mt-5 px-1 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Lavandería</h1>
-          <p className="text-emerald-300/80 font-bold text-xs uppercase tracking-widest mt-1">
+          <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Lavandería</h1>
+          <p className="text-emerald-300/80 font-bold text-[10px] uppercase tracking-widest mt-0.5">
             {lavanderiaPrendas.length} prenda{lavanderiaPrendas.length !== 1 && 's'} lavándose
           </p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/buscar" className="p-2.5 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
-            <Search size={20} strokeWidth={2.5} />
+        <div className="flex gap-1.5">
+          <Link href="/buscar" className="p-2 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
+            <Search size={18} strokeWidth={2.5} />
           </Link>
-          <Link href="/ajustes" className="p-2.5 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
-            <Settings size={20} strokeWidth={2.5} />
+          <Link href="/ajustes" className="p-2 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
+            <Settings size={18} strokeWidth={2.5} />
           </Link>
         </div>
       </header>
@@ -101,26 +101,27 @@ export default function LavanderiaPage() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-5">
           {sortedKeys.map((tipoKey) => (
-            <div key={tipoKey} className="flex flex-col gap-4">
-              <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
+            <div key={tipoKey} className="flex flex-col gap-2">
+              <h2 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] px-1 flex items-center gap-1.5">
+                {getEmojiForTipo(tipoKey, "w-3.5 h-3.5 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-emerald-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 {groupedPrendas[tipoKey].map((prenda) => (
                   <PrendaCard
                     key={prenda.id}
                     prenda={prenda}
+                    compact
                     actionButton={
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleReceiveOne(prenda.id);
                         }}
-                        className="w-full flex items-center justify-center gap-1.5 text-emerald-500 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[10px] uppercase tracking-wider"
+                        className="w-full flex items-center justify-center gap-1 text-emerald-500 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[8px] uppercase tracking-wider"
                       >
-                        <CheckCircle2 size={14} />
+                        <CheckCircle2 size={10} />
                         Recibido
                       </button>
                     }

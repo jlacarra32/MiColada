@@ -38,11 +38,12 @@ export default function SearchPage() {
         </div>
       </header>
 
-      <div className="flex-1 p-4 pb-32">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="flex-1 p-3 pb-32">
+        <div className="grid grid-cols-3 gap-2">
           {filteredPrendas.map((prenda) => (
             <PrendaCard
               key={prenda.id}
+              compact
               prenda={prenda}
               actionButton={
                 <button

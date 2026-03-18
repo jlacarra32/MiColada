@@ -10,10 +10,15 @@ import Toast from "@/components/Toast";
 import { WashingMachine, Settings, Search, CheckSquare, Square } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
 
+interface SelectedItem {
+  id: string;
+  qty: number;
+}
+
 export default function ArmarioPage() {
   const { prendas, isLoaded, sendToLaundry } = usePrendas();
   const { tipos } = useConfig();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [toast, setToast] = useState({ visible: false, message: "" });
   
   const armarioPrendas = useMemo(
@@ -26,29 +31,48 @@ export default function ArmarioPage() {
     [prendas]
   );
 
+  const isSelected = useCallback((id: string) => {
+    return selectedItems.some(s => s.id === id);
+  }, [selectedItems]);
+
+  const getQty = useCallback((id: string) => {
+    return selectedItems.find(s => s.id === id)?.qty ?? 1;
+  }, [selectedItems]);
+
   const toggleSelection = useCallback((id: string) => {
-    setSelectedIds((prev) => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    setSelectedItems((prev) => 
+      prev.some(s => s.id === id)
+        ? prev.filter(s => s.id !== id)
+        : [...prev, { id, qty: 1 }]
+    );
+  }, []);
+
+  const updateQty = useCallback((id: string, qty: number) => {
+    setSelectedItems((prev) =>
+      prev.map(s => s.id === id ? { ...s, qty } : s)
     );
   }, []);
 
   const toggleSelectAll = useCallback(() => {
-    if (selectedIds.length === armarioPrendas.length) {
-      setSelectedIds([]);
+    if (selectedItems.length === armarioPrendas.length) {
+      setSelectedItems([]);
     } else {
-      setSelectedIds(armarioPrendas.map(p => p.id));
+      setSelectedItems(armarioPrendas.map(p => ({ id: p.id, qty: 1 })));
     }
-  }, [selectedIds.length, armarioPrendas]);
+  }, [selectedItems.length, armarioPrendas]);
 
   const handleSendToLaundry = useCallback(() => {
-    const count = selectedIds.length;
-    sendToLaundry(selectedIds);
-    setSelectedIds([]);
+    const ids = selectedItems.map(s => s.id);
+    const count = selectedItems.length;
+    const totalBags = selectedItems.reduce((sum, s) => sum + s.qty, 0);
+    sendToLaundry(ids);
+    setSelectedItems([]);
+    const bagInfo = totalBags > count ? ` (${totalBags} bolsas)` : "";
     setToast({
       visible: true,
-      message: `¡${count} prenda${count !== 1 ? 's' : ''} enviada${count !== 1 ? 's' : ''} a lavar!`,
+      message: `¡${count} prenda${count !== 1 ? 's' : ''} enviada${count !== 1 ? 's' : ''} a lavar!${bagInfo}`,
     });
-  }, [selectedIds, sendToLaundry]);
+  }, [selectedItems, sendToLaundry]);
 
   const closeToast = useCallback(() => {
     setToast({ visible: false, message: "" });
@@ -78,37 +102,37 @@ export default function ArmarioPage() {
     return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando armario...</div>;
   }
 
-  const allSelected = armarioPrendas.length > 0 && selectedIds.length === armarioPrendas.length;
+  const allSelected = armarioPrendas.length > 0 && selectedItems.length === armarioPrendas.length;
 
   return (
-    <div className="min-h-full p-4 pb-28 flex flex-col gap-4">
-      <header className="mb-2 mt-6 px-2 flex justify-between items-end">
+    <div className="min-h-full p-3 pb-28 flex flex-col gap-3">
+      <header className="mb-1 mt-5 px-1 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Mi Armario</h1>
-          <p className="text-cyan-200/80 font-bold text-xs uppercase tracking-widest mt-1">
+          <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Mi Armario</h1>
+          <p className="text-cyan-200/80 font-bold text-[10px] uppercase tracking-widest mt-0.5">
             {armarioPrendas.length} prenda{armarioPrendas.length !== 1 && 's'} limpia{armarioPrendas.length !== 1 && 's'}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/buscar" className="p-2.5 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
-            <Search size={20} strokeWidth={2.5} />
+        <div className="flex gap-1.5">
+          <Link href="/buscar" className="p-2 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
+            <Search size={18} strokeWidth={2.5} />
           </Link>
-          <Link href="/ajustes" className="p-2.5 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
-            <Settings size={20} strokeWidth={2.5} />
+          <Link href="/ajustes" className="p-2 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
+            <Settings size={18} strokeWidth={2.5} />
           </Link>
         </div>
       </header>
 
-      {/* Stats Summary */}
+      {/* Stats Summary - more compact */}
       {prendas.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 px-1">
-          <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-3 flex flex-col items-center">
-            <span className="text-2xl font-black text-cyan-400 tabular-nums">{armarioPrendas.length}</span>
-            <span className="text-[10px] font-bold text-cyan-300/60 uppercase tracking-widest">En armario</span>
+        <div className="grid grid-cols-2 gap-2 px-0.5">
+          <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2 flex items-center gap-2 justify-center">
+            <span className="text-lg font-black text-cyan-400 tabular-nums">{armarioPrendas.length}</span>
+            <span className="text-[9px] font-bold text-cyan-300/60 uppercase tracking-widest">En armario</span>
           </div>
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 flex flex-col items-center">
-            <span className="text-2xl font-black text-emerald-400 tabular-nums">{lavanderiaCount}</span>
-            <span className="text-[10px] font-bold text-emerald-300/60 uppercase tracking-widest">En lavandería</span>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2 flex items-center gap-2 justify-center">
+            <span className="text-lg font-black text-emerald-400 tabular-nums">{lavanderiaCount}</span>
+            <span className="text-[9px] font-bold text-emerald-300/60 uppercase tracking-widest">Lavandería</span>
           </div>
         </div>
       )}
@@ -135,38 +159,41 @@ export default function ArmarioPage() {
       ) : (
         <>
           {/* Select All Bar */}
-          <div className="flex justify-between items-center px-2">
+          <div className="flex justify-between items-center px-1">
             <button
               onClick={toggleSelectAll}
-              className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-cyan-400 transition-colors active:scale-95"
+              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-cyan-400 transition-colors active:scale-95"
             >
               {allSelected ? (
-                <CheckSquare size={16} className="text-cyan-400" />
+                <CheckSquare size={14} className="text-cyan-400" />
               ) : (
-                <Square size={16} />
+                <Square size={14} />
               )}
-              {allSelected ? "Deseleccionar todo" : "Seleccionar todo"}
+              {allSelected ? "Deseleccionar" : "Seleccionar todo"}
             </button>
-            {selectedIds.length > 0 && (
-              <span className="text-xs font-bold text-cyan-400 tabular-nums">
-                {selectedIds.length} seleccionada{selectedIds.length !== 1 && "s"}
+            {selectedItems.length > 0 && (
+              <span className="text-[10px] font-bold text-cyan-400 tabular-nums">
+                {selectedItems.length} sel.
               </span>
             )}
           </div>
 
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-5">
             {sortedKeys.map((tipoKey) => (
-              <div key={tipoKey} className="flex flex-col gap-4">
-                <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                  {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
+              <div key={tipoKey} className="flex flex-col gap-2">
+                <h2 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] px-1 flex items-center gap-1.5">
+                  {getEmojiForTipo(tipoKey, "w-3.5 h-3.5 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   {groupedPrendas[tipoKey].map((prenda) => (
                     <PrendaCard
                       key={prenda.id}
                       prenda={prenda}
-                      selected={selectedIds.includes(prenda.id)}
+                      compact
+                      selected={isSelected(prenda.id)}
+                      selectedQty={getQty(prenda.id)}
                       onClick={() => toggleSelection(prenda.id)}
+                      onQtyChange={(qty) => updateQty(prenda.id, qty)}
                     />
                   ))}
                 </div>
@@ -176,9 +203,9 @@ export default function ArmarioPage() {
         </>
       )}
 
-      {selectedIds.length > 0 && (
+      {selectedItems.length > 0 && (
         <FAB 
-          label={`Enviar ${selectedIds.length} a lavar`}
+          label={`Enviar ${selectedItems.length} a lavar`}
           onClick={handleSendToLaundry}
           icon={<WashingMachine size={20} />}
         />

@@ -27,8 +27,8 @@ export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQ
   const mutedText = colorStyle.isDark ? "text-white/70" : "text-black/60";
   const iconBg = colorStyle.isDark ? "bg-white/10" : "bg-black/5";
 
-  const iconSize = compact ? "w-8 h-8" : "w-12 h-12";
-  const containerIconSize = compact ? "w-10 h-10" : "w-14 h-14";
+  const iconSize = compact ? "w-8 h-8" : "w-9 h-9";
+  const containerIconSize = compact ? "w-10 h-10" : "w-11 h-11";
 
   return (
     <div

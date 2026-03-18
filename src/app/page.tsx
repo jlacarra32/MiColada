@@ -149,20 +149,14 @@ export default function ArmarioPage() {
         </header>
 
         {prendas.length > 0 && (
-          <section className="mb-4 grid grid-cols-2 gap-2.5">
-            <div className="rounded-[24px] border border-cyan-400/18 bg-cyan-400/10 p-3.5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200/80">En armario</p>
-              <div className="mt-2 flex items-end justify-between gap-2">
-                <span className="text-xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
-                <span className="text-[10px] text-cyan-100/80">listas para usar</span>
-              </div>
+          <section className="mb-4 grid grid-cols-2 gap-2">
+            <div className="flex items-center justify-between rounded-2xl border border-cyan-400/18 bg-cyan-400/10 px-3 py-2.5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-cyan-200/80">En armario</p>
+              <span className="text-[15px] font-black text-white tabular-nums">{armarioPrendas.length}</span>
             </div>
-            <div className="rounded-[24px] border border-emerald-400/18 bg-emerald-400/10 p-3.5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Lavandería</p>
-              <div className="mt-2 flex items-end justify-between gap-2">
-                <span className="text-xl font-black text-white tabular-nums">{lavanderiaCount}</span>
-                <span className="text-[10px] text-emerald-100/80">en proceso</span>
-              </div>
+            <div className="flex items-center justify-between rounded-2xl border border-emerald-400/18 bg-emerald-400/10 px-3 py-2.5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-200/80">Lavandería</p>
+              <span className="text-[15px] font-black text-white tabular-nums">{lavanderiaCount}</span>
             </div>
           </section>
         )}

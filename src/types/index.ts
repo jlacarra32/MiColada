@@ -7,4 +7,5 @@ export interface Prenda {
   detalle: string;
   estado: EstadoPrenda;
   fechaEnvio?: number;
+  cantidad?: number;
 }

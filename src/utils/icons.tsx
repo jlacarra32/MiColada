@@ -42,6 +42,9 @@ export function getEmojiForTipo(tipo: string, className?: string): React.ReactNo
     "bañador": "/icons/swimwear.png",
     "bikini": "/icons/swimwear.png",
     "deporte": "/icons/sport-suit.png",
+    "ropa de deporte": "/icons/sport-suit.png",
+    "deportiva": "/icons/sport-suit.png",
+    "gym": "/icons/sport-suit.png",
     "malla": "/icons/sport-suit.png",
     "pijama": "/icons/pajamas.png"
   };

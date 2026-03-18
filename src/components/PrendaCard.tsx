@@ -75,6 +75,16 @@ export default function PrendaCard({ prenda, selected, onClick, actionButton, ch
               {prenda.tipo}
             </p>
           )}
+
+          {prenda.cantidad && prenda.cantidad > 1 && (
+            <div className={clsx(
+              "mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider flex items-center gap-1",
+              colorStyle.isDark ? "bg-white/15 text-white/90" : "bg-black/10 text-black/70"
+            )}>
+              <span>×{prenda.cantidad}</span>
+              <span>bolsa{prenda.cantidad > 1 ? "s" : ""}</span>
+            </div>
+          )}
         </div>
         
         {children && <div className="mt-1 w-full">{children}</div>}

@@ -3,9 +3,14 @@
 import React, { useEffect, useState } from 'react';
 
 /**
- * Advanced background removal.
+ * Advanced background removal with global cache.
  * Analyzes the corners to detect the background color and removes it with a fuzz factor.
+ * Processed images are cached globally to avoid re-processing on re-renders.
  */
+
+// Global cache for processed icons — persists across component instances and re-renders
+const iconCache = new Map<string, string>();
+
 interface TransparentIconProps {
   src: string;
   alt: string;
@@ -13,9 +18,18 @@ interface TransparentIconProps {
 }
 
 export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) => {
-  const [processedSrc, setProcessedSrc] = useState<string | null>(null);
+  const [processedSrc, setProcessedSrc] = useState<string | null>(() => {
+    // Check cache synchronously on mount
+    return iconCache.get(src) || null;
+  });
 
   useEffect(() => {
+    // If already cached, set immediately and skip processing
+    if (iconCache.has(src)) {
+      setProcessedSrc(iconCache.get(src)!);
+      return;
+    }
+
     let isMounted = true;
     const img = new Image();
     img.src = src;
@@ -46,7 +60,7 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
       });
       bgR /= 4; bgG /= 4; bgB /= 4;
 
-      const threshold = 60; // Higher threshold to catch variations
+      const threshold = 60;
 
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
@@ -60,17 +74,20 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
         );
 
         if (diff < threshold) {
-          // If the pixel is very close to the sampled background, remove it
           data[i + 3] = 0;
         } else if (diff < threshold * 1.5) {
-          // Soft edge transition
           data[i + 3] = ((diff - threshold) / (threshold * 0.5)) * 255;
         }
       }
 
       ctx.putImageData(imageData, 0, 0);
+      const dataUrl = canvas.toDataURL();
+      
+      // Store in global cache
+      iconCache.set(src, dataUrl);
+      
       if (isMounted) {
-        setProcessedSrc(canvas.toDataURL());
+        setProcessedSrc(dataUrl);
       }
     };
 

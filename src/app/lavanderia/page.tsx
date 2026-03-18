@@ -1,40 +1,72 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePrendas } from "@/hooks/usePrendas";
 import { useConfig } from "@/hooks/useConfig";
 import PrendaCard from "@/components/PrendaCard";
 import TimeAgoText from "@/components/TimeAgoText";
-import { WashingMachine, Settings, Search, CheckCircle2, Waves } from "lucide-react";
+import Toast from "@/components/Toast";
+import FAB from "@/components/FAB";
+import { WashingMachine, Settings, Search, CheckCircle2, Waves, PackageCheck } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
 
 export default function LavanderiaPage() {
   const { prendas, isLoaded, receiveFromLaundry } = usePrendas();
   const { tipos } = useConfig();
+  const [toast, setToast] = useState({ visible: false, message: "" });
   
-  const lavanderiaPrendas = prendas.filter((p) => p.estado === "en_lavanderia")
-    .sort((a, b) => (b.fechaEnvio || 0) - (a.fechaEnvio || 0));
+  const lavanderiaPrendas = useMemo(
+    () => prendas
+      .filter((p) => p.estado === "en_lavanderia")
+      .sort((a, b) => (b.fechaEnvio || 0) - (a.fechaEnvio || 0)),
+    [prendas]
+  );
+
+  const closeToast = useCallback(() => {
+    setToast({ visible: false, message: "" });
+  }, []);
+
+  const handleReceiveAll = useCallback(() => {
+    const count = lavanderiaPrendas.length;
+    lavanderiaPrendas.forEach(p => receiveFromLaundry(p.id));
+    setToast({
+      visible: true,
+      message: `¡${count} prenda${count !== 1 ? 's' : ''} recibida${count !== 1 ? 's' : ''}!`,
+    });
+  }, [lavanderiaPrendas, receiveFromLaundry]);
+
+  const handleReceiveOne = useCallback((id: string) => {
+    receiveFromLaundry(id);
+    setToast({
+      visible: true,
+      message: "¡Prenda recibida! 🎉",
+    });
+  }, [receiveFromLaundry]);
+
+  // Grouped and sorted
+  const { groupedPrendas, sortedKeys } = useMemo(() => {
+    const grouped = lavanderiaPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
+      if (!acc[prenda.tipo]) acc[prenda.tipo] = [];
+      acc[prenda.tipo].push(prenda);
+      return acc;
+    }, {});
+
+    const keys = Object.keys(grouped).sort((a, b) => {
+      const idxA = tipos.indexOf(a);
+      const idxB = tipos.indexOf(b);
+      if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+
+    return { groupedPrendas: grouped, sortedKeys: keys };
+  }, [lavanderiaPrendas, tipos]);
 
   if (!isLoaded) {
     return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando lavandería...</div>;
   }
-
-  // Grupos por tipo
-  const groupedPrendas = lavanderiaPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
-    if (!acc[prenda.tipo]) acc[prenda.tipo] = [];
-    acc[prenda.tipo].push(prenda);
-    return acc;
-  }, {});
-
-  // Ordenar categorías según config
-  const sortedKeys = Object.keys(groupedPrendas).sort((a, b) => {
-    const idxA = tipos.indexOf(a);
-    const idxB = tipos.indexOf(b);
-    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
-    if (idxA === -1) return 1;
-    if (idxB === -1) return -1;
-    return idxA - idxB;
-  });
 
   return (
     <div className="min-h-full p-4 pb-28 flex flex-col gap-4">
@@ -84,7 +116,7 @@ export default function LavanderiaPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          receiveFromLaundry(prenda.id);
+                          handleReceiveOne(prenda.id);
                         }}
                         className="w-full flex items-center justify-center gap-1.5 text-emerald-500 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[10px] uppercase tracking-wider"
                       >
@@ -101,6 +133,20 @@ export default function LavanderiaPage() {
           ))}
         </div>
       )}
+
+      {lavanderiaPrendas.length > 1 && (
+        <FAB
+          label="Recibir todo"
+          onClick={handleReceiveAll}
+          icon={<PackageCheck size={20} />}
+        />
+      )}
+
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        onClose={closeToast}
+      />
     </div>
   );
 }

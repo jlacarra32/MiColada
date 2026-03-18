@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePrendas } from "@/hooks/usePrendas";
-import { useConfig } from "@/hooks/useConfig";
+import { useConfig, isBagType } from "@/hooks/useConfig";
 import Chip from "@/components/Chip";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Minus, Plus, Package } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
 
 export default function AddPage() {
@@ -16,13 +16,29 @@ export default function AddPage() {
   const [tipo, setTipo] = useState("");
   const [color, setColor] = useState("");
   const [detalle, setDetalle] = useState("");
+  const [cantidad, setCantidad] = useState(1);
+
+  const showCantidad = tipo && isBagType(tipo);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!tipo || !color) return;
 
-    addPrenda({ tipo, color, detalle: detalle.trim() });
+    addPrenda({
+      tipo,
+      color,
+      detalle: detalle.trim(),
+      ...(showCantidad ? { cantidad } : {}),
+    });
     router.push("/");
+  };
+
+  const handleTipoSelect = (t: string) => {
+    setTipo(t);
+    // Reset cantidad when switching types
+    if (!isBagType(t)) {
+      setCantidad(1);
+    }
   };
 
   const isFormValid = tipo.length > 0 && color.length > 0;
@@ -47,11 +63,53 @@ export default function AddPage() {
                   key={t}
                   label={t}
                   selected={tipo === t}
-                  onClick={() => setTipo(t)}
+                  onClick={() => handleTipoSelect(t)}
                 />
               ))}
             </div>
           </section>
+
+          {/* Quantity selector for bag-based items */}
+          {showCantidad && (
+            <section className="animate-in slide-in-from-top-2 fade-in duration-300">
+              <h2 className="text-sm font-bold text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Package size={14} />
+                Cantidad de Bolsas
+              </h2>
+              <div className="bg-zinc-800/80 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {getEmojiForTipo(tipo, "w-8 h-8")}
+                  <div>
+                    <p className="text-white font-semibold text-sm">{tipo}</p>
+                    <p className="text-zinc-500 text-xs">
+                      {cantidad === 1 ? "1 bolsa" : `${cantidad} bolsas`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCantidad(Math.max(1, cantidad - 1))}
+                    disabled={cantidad <= 1}
+                    className="w-10 h-10 rounded-xl bg-zinc-700/80 border border-white/10 flex items-center justify-center text-white transition-all active:scale-90 disabled:opacity-30 disabled:scale-100 hover:bg-zinc-600"
+                  >
+                    <Minus size={18} />
+                  </button>
+                  <span className="w-10 text-center font-black text-xl text-white tabular-nums">
+                    {cantidad}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCantidad(Math.min(10, cantidad + 1))}
+                    disabled={cantidad >= 10}
+                    className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 transition-all active:scale-90 disabled:opacity-30 disabled:scale-100 hover:bg-cyan-500/30"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
 
           <section>
             <h2 className="text-sm font-bold text-cyan-400 uppercase tracking-widest mb-3">Color o Patrón</h2>
@@ -88,7 +146,10 @@ export default function AddPage() {
           className="w-11/12 bg-gradient-to-r from-cyan-500 to-blue-600 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 disabled:opacity-100 disabled:scale-100 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-1 active:scale-95 shadow-lg shadow-cyan-500/20 disabled:shadow-none disabled:translate-y-0 text-lg border border-white/10 disabled:border-transparent"
         >
           <PlusCircle size={22} className={!isFormValid ? "opacity-50" : ""} />
-          Guardar Prenda
+          {showCantidad && cantidad > 1
+            ? `Guardar ${cantidad} Bolsas`
+            : "Guardar Prenda"
+          }
         </button>
       </div>
     </div>

@@ -8,9 +8,17 @@ const DEFAULT_TIPOS = [
   "Pantalón largo",
   "Vaquero largo",
   "Pantalón corto",
+  "Ropa de Deporte",
+  "Interior",
+  "Calcetines",
   "Toalla",
   "Sábana"
 ];
+
+export const BAG_TIPOS = ["Interior", "Calcetines"];
+export function isBagType(tipo: string): boolean {
+  return BAG_TIPOS.some(b => tipo.toLowerCase().includes(b.toLowerCase()));
+}
 
 const DEFAULT_COLORES = [
   "Blanco",

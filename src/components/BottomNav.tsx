@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shirt, WashingMachine, PlusCircle } from "lucide-react";
+import { Shirt, WashingMachine, Home } from "lucide-react";
 import clsx from "clsx";
 
 export default function BottomNav() {
@@ -10,7 +10,7 @@ export default function BottomNav() {
 
   const navItems = [
     { label: "Armario", href: "/", icon: Shirt },
-    { label: "Añadir", href: "/add", icon: PlusCircle, special: true },
+    { label: "Inicio", href: "/inicio", icon: Home },
     { label: "Lavandería", href: "/lavanderia", icon: WashingMachine },
   ];
 
@@ -24,22 +24,6 @@ export default function BottomNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
-
-          if (item.special) {
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-label="Añadir una nueva prenda"
-                className="group relative z-10 -mt-7 flex w-20 flex-col items-center justify-center"
-              >
-                <div className="rounded-[22px] border border-cyan-200/20 bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 p-4 text-white shadow-[0_14px_30px_rgba(14,165,233,0.38)] transition-all duration-300 ease-out group-active:scale-95">
-                  <Icon size={30} strokeWidth={2.5} />
-                </div>
-                <span className="mt-1 text-[11px] font-bold tracking-wide text-zinc-300 transition-colors group-hover:text-cyan-300">{item.label}</span>
-              </Link>
-            );
-          }
 
           return (
             <Link

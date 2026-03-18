@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
@@ -116,7 +116,7 @@ export default function ArmarioPage() {
 
   return (
     <>
-      <div className="min-h-full px-4 pb-36 pt-5">
+      <div className="min-h-full px-4 pb-24 pt-5">
         <header className="mb-5 flex items-start justify-between gap-4">
           <div className="space-y-3">
             <span className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200">
@@ -153,14 +153,14 @@ export default function ArmarioPage() {
             <div className="rounded-[28px] border border-cyan-400/18 bg-cyan-400/10 p-4">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200/80">En armario</p>
               <div className="mt-3 flex items-end justify-between gap-3">
-                <span className="text-3xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
+                <span className="text-2xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
                 <span className="text-xs text-cyan-100/80">listas para usar</span>
               </div>
             </div>
             <div className="rounded-[28px] border border-emerald-400/18 bg-emerald-400/10 p-4">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Lavandería</p>
               <div className="mt-3 flex items-end justify-between gap-3">
-                <span className="text-3xl font-black text-white tabular-nums">{lavanderiaCount}</span>
+                <span className="text-2xl font-black text-white tabular-nums">{lavanderiaCount}</span>
                 <span className="text-xs text-emerald-100/80">en proceso</span>
               </div>
             </div>
@@ -269,7 +269,7 @@ export default function ArmarioPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">
-                  {editingPrenda.detalle ? `\"${editingPrenda.detalle}\"` : editingPrenda.tipo}
+                  {editingPrenda.detalle ? editingPrenda.detalle : editingPrenda.tipo}
                 </h3>
                 <p className="text-sm text-zinc-300">{getColorName(editingPrenda.color)}</p>
               </div>

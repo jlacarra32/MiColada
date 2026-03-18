@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
@@ -48,7 +48,7 @@ export default function LavanderiaPage() {
 
   return (
     <>
-      <div className="min-h-full px-4 pb-36 pt-5">
+      <div className="min-h-full px-4 pb-24 pt-5">
         <header className="mb-5 flex items-start justify-between gap-4">
           <div className="space-y-3">
             <span className="inline-flex rounded-full border border-emerald-300/20 bg-emerald-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200">
@@ -99,7 +99,7 @@ export default function LavanderiaPage() {
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Resumen de colada</p>
               <div className="mt-3 flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-3xl font-black text-white tabular-nums">{lavanderiaPrendas.length}</p>
+                  <p className="text-2xl font-black text-white tabular-nums">{lavanderiaPrendas.length}</p>
                   <p className="mt-1 text-sm text-zinc-300">prendas esperando a ser recibidas</p>
                 </div>
                 {lavanderiaPrendas[0]?.fechaEnvio && (

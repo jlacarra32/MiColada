@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -74,7 +74,7 @@ export default function AddPage() {
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-lg font-bold text-white">
-              {detalle ? `\"${detalle}\"` : tipo || "Tu nueva prenda"}
+              {detalle ? detalle : tipo || "Tu nueva prenda"}
             </h2>
             <p className="mt-1 text-sm text-zinc-300">
               {tipo ? `${tipo}${color ? ` · ${getColorName(color)}` : ""}` : "Selecciona una categoría y un color para verla completa."}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,7 +11,7 @@ export default function BottomNav() {
   const navItems = [
     { label: "Armario", href: "/", icon: Shirt },
     { label: "Añadir", href: "/add", icon: PlusCircle, special: true },
-    { label: "Lavandería", href: "/Lavandería", icon: WashingMachine },
+    { label: "Lavandería", href: "/lavanderia", icon: WashingMachine },
   ];
 
   return (

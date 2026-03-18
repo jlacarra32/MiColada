@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { Prenda } from "@/types";
 import { CheckCircle2, Minus, Plus } from "lucide-react";
 import clsx from "clsx";
@@ -40,7 +40,7 @@ export default function PrendaCard({
 
   const iconSize = compact ? (smallPreviewIcon ? "h-7 w-7" : "h-8 w-8") : smallPreviewIcon ? "h-7 w-7" : "h-8 w-8";
   const containerIconSize = compact ? (smallPreviewIcon ? "h-11 w-11" : "h-12 w-12") : smallPreviewIcon ? "h-11 w-11" : "h-12 w-12";
-  const title = prenda.detalle ? `\"${prenda.detalle}\"` : hideTipoLabel ? colorName || prenda.tipo : prenda.tipo;
+  const title = prenda.detalle ? prenda.detalle : hideTipoLabel ? colorName || prenda.tipo : prenda.tipo;
 
   return (
     <div
@@ -69,56 +69,43 @@ export default function PrendaCard({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_55%)] opacity-70" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[size:10px_10px] opacity-[0.05]" />
 
-      <div className="relative flex w-full flex-col items-center">
-        <div className={clsx(containerIconSize, "relative mx-auto mb-1.5 flex items-center justify-center")}>
-          <div className="absolute inset-0 scale-125 rounded-full bg-white/10 blur-xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100" />
+      <div className="relative flex w-full flex-col">
+        <div className="relative flex w-full flex-row items-center gap-3">
+          <div className={clsx(containerIconSize, "relative flex-shrink-0 flex items-center justify-center")}>
+            <div className="absolute inset-0 scale-125 rounded-full bg-white/10 blur-xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100" />
 
-          <div className={clsx("flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/12 transition-transform duration-500 group-hover/card:scale-105", iconBg)}>
-            {getEmojiForTipo(prenda.tipo, iconSize)}
+            <div className={clsx("flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/12 transition-transform duration-500 group-hover/card:scale-105", iconBg)}>
+              {getEmojiForTipo(prenda.tipo, iconSize)}
+            </div>
+
+            {prenda.estado === "en_lavanderia" && (
+              <div className="absolute -right-0.5 -top-0.5 z-20 rounded-full border-2 border-zinc-900 bg-emerald-500 p-0.5 text-white shadow-lg">
+                <CheckCircle2 size={9} strokeWidth={3} />
+              </div>
+            )}
           </div>
 
-          {prenda.estado === "en_lavanderia" && (
-            <div className="absolute -right-0.5 -top-0.5 z-20 rounded-full border-2 border-zinc-900 bg-emerald-500 p-0.5 text-white shadow-lg">
-              <CheckCircle2 size={9} strokeWidth={3} />
-            </div>
-          )}
-        </div>
+          <div className="flex min-w-0 flex-1 flex-col items-start justify-center">
+            <h3 className={clsx("w-full truncate text-left leading-tight", compact ? "text-[13px] font-bold" : "text-[15px] font-bold")}>
+              {title}
+            </h3>
 
-        <div className="flex flex-col items-center">
-          <h3 className={clsx("line-clamp-1 px-0.5 leading-tight", compact ? "text-[12px] font-bold" : "text-sm font-semibold")}>{title}</h3>
-
-          {prenda.detalle && !hideTipoLabel && (
-            <p className={clsx("font-black uppercase tracking-[0.16em] opacity-45", mutedText, compact ? "text-[8px]" : "text-[10px]")}>
-              {prenda.tipo}
-            </p>
-          )}
-
-          {colorName && (
-            <span
-              className={clsx(
-                "mt-1 inline-flex rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em]",
-                colorStyle.isDark ? "bg-white/14 text-white/80" : "bg-black/10 text-black/65"
-              )}
-            >
-              {colorName}
-            </span>
-          )}
-
-          {prenda.estado === "en_lavanderia" && prenda.cantidadEnviada && prenda.cantidadEnviada > 1 && (
-            <div
-              className={clsx(
-                "mt-1 flex items-center gap-0.5 rounded-full px-2 py-1 font-bold uppercase tracking-[0.14em]",
-                compact ? "text-[8px]" : "text-[10px]",
-                colorStyle.isDark ? "bg-white/15 text-white/80" : "bg-black/10 text-black/60"
-              )}
-            >
-              x{prenda.cantidadEnviada}
-            </div>
-          )}
+            {prenda.estado === "en_lavanderia" && prenda.cantidadEnviada && prenda.cantidadEnviada > 1 && (
+              <div
+                className={clsx(
+                  "mt-1 flex items-center gap-0.5 rounded-full px-2 py-0.5 font-bold uppercase tracking-[0.14em]",
+                  compact ? "text-[9px]" : "text-[11px]",
+                  colorStyle.isDark ? "bg-white/15 text-white/80" : "bg-black/10 text-black/60"
+                )}
+              >
+                x{prenda.cantidadEnviada}
+              </div>
+            )}
+          </div>
         </div>
 
         {selected && prenda.esMultiple && onQtyChange && selectedQty !== undefined && (
-          <div className="mt-2 flex w-full items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div className="mt-3 flex w-full items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               onClick={(e) => {
@@ -145,7 +132,7 @@ export default function PrendaCard({
           </div>
         )}
 
-        {children && <div className="mt-1.5 w-full">{children}</div>}
+        {children && <div className="mt-2 w-full">{children}</div>}
       </div>
 
       {selected && (

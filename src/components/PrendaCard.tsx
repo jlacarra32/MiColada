@@ -15,12 +15,13 @@ interface Props {
   selectedQty?: number;
   onClick?: () => void;
   onQtyChange?: (qty: number) => void;
+  onEditClick?: () => void;
   actionButton?: React.ReactNode;
   children?: React.ReactNode;
   compact?: boolean;
 }
 
-export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQtyChange, actionButton, children, compact = false }: Props) {
+export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQtyChange, onEditClick, actionButton, children, compact = false }: Props) {
   const colorStyle = getColorStyle(prenda.color);
   const textColor = colorStyle.isDark ? "text-white" : "text-black";
   const mutedText = colorStyle.isDark ? "text-white/70" : "text-black/60";
@@ -81,14 +82,14 @@ export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQ
             </p>
           )}
 
-          {/* Multiple badge */}
-          {prenda.esMultiple && (
+          {/* Quantity sent badge (only visible if sent) */}
+          {prenda.estado === "en_lavanderia" && prenda.cantidadEnviada && prenda.cantidadEnviada > 1 && (
             <div className={clsx(
               "mt-0.5 px-1.5 py-0 rounded-full font-bold uppercase tracking-wider flex items-center gap-0.5",
               compact ? "text-[7px]" : "text-[8px]",
               colorStyle.isDark ? "bg-white/15 text-white/80" : "bg-black/10 text-black/60"
             )}>
-              📦 bolsas
+              ×{prenda.cantidadEnviada}
             </div>
           )}
         </div>
@@ -123,6 +124,19 @@ export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQ
         <div className="absolute top-1.5 right-1.5 text-white animate-in zoom-in duration-300 bg-cyan-500 rounded-full p-0.5 shadow-lg z-20">
           <CheckCircle2 size={10} strokeWidth={3} />
         </div>
+      )}
+
+      {onEditClick && !selected && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onEditClick(); }}
+          className="absolute top-1.5 left-1.5 z-20 w-5 h-5 bg-black/30 backdrop-blur-sm text-white/70 hover:text-white rounded-full flex items-center justify-center transition-all hover:bg-black/50"
+        >
+          <div className="flex gap-0.5">
+            <span className="w-0.5 h-0.5 rounded-full bg-current"></span>
+            <span className="w-0.5 h-0.5 rounded-full bg-current"></span>
+            <span className="w-0.5 h-0.5 rounded-full bg-current"></span>
+          </div>
+        </button>
       )}
 
       {actionButton && (

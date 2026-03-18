@@ -7,8 +7,9 @@ import { useConfig } from "@/hooks/useConfig";
 import PrendaCard from "@/components/PrendaCard";
 import FAB from "@/components/FAB";
 import Toast from "@/components/Toast";
-import { WashingMachine, Settings, Search, CheckSquare, Square } from "lucide-react";
+import { WashingMachine, Settings, Search, CheckSquare, Square, Trash2, X } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
+import { Prenda } from "@/types";
 
 interface SelectedItem {
   id: string;
@@ -16,10 +17,13 @@ interface SelectedItem {
 }
 
 export default function ArmarioPage() {
-  const { prendas, isLoaded, sendToLaundry } = usePrendas();
+  const { prendas, isLoaded, sendToLaundry, removePrenda, updatePrenda } = usePrendas();
   const { tipos } = useConfig();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [toast, setToast] = useState({ visible: false, message: "" });
+  
+  // Edit modal state
+  const [editingPrenda, setEditingPrenda] = useState<Prenda | null>(null);
   
   const armarioPrendas = useMemo(
     () => prendas.filter((p) => p.estado === "en_armario"),
@@ -62,21 +66,35 @@ export default function ArmarioPage() {
   }, [selectedItems.length, armarioPrendas]);
 
   const handleSendToLaundry = useCallback(() => {
-    const ids = selectedItems.map(s => s.id);
+    const items = selectedItems.map(s => ({ id: s.id, qty: s.qty }));
     const count = selectedItems.length;
-    const totalBags = selectedItems.reduce((sum, s) => sum + s.qty, 0);
-    sendToLaundry(ids);
+    sendToLaundry(items);
     setSelectedItems([]);
-    const bagInfo = totalBags > count ? ` (${totalBags} bolsas)` : "";
     setToast({
       visible: true,
-      message: `¡${count} prenda${count !== 1 ? 's' : ''} enviada${count !== 1 ? 's' : ''} a lavar!${bagInfo}`,
+      message: `¡${count} prenda${count !== 1 ? 's' : ''} enviada${count !== 1 ? 's' : ''} a lavar!`,
     });
   }, [selectedItems, sendToLaundry]);
 
   const closeToast = useCallback(() => {
     setToast({ visible: false, message: "" });
   }, []);
+
+  const handleDelete = () => {
+    if (!editingPrenda) return;
+    if (confirm("¿Estás seguro de que deseas eliminar esta prenda?")) {
+      removePrenda(editingPrenda.id);
+      setEditingPrenda(null);
+      setToast({ visible: true, message: "Prenda eliminada correctamente." });
+    }
+  };
+
+  const handleChangeTipo = (newTipo: string) => {
+    if (!editingPrenda) return;
+    updatePrenda(editingPrenda.id, { tipo: newTipo });
+    setEditingPrenda(null);
+    setToast({ visible: true, message: "Categoría actualizada." });
+  };
 
   // Grouped and sorted prendas
   const { groupedPrendas, sortedKeys } = useMemo(() => {
@@ -105,7 +123,7 @@ export default function ArmarioPage() {
   const allSelected = armarioPrendas.length > 0 && selectedItems.length === armarioPrendas.length;
 
   return (
-    <div className="min-h-full p-3 pb-28 flex flex-col gap-3">
+    <div className="min-h-full p-3 pb-28 flex flex-col gap-3 relative">
       <header className="mb-1 mt-5 px-1 flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Mi Armario</h1>
@@ -194,6 +212,7 @@ export default function ArmarioPage() {
                       selectedQty={getQty(prenda.id)}
                       onClick={() => toggleSelection(prenda.id)}
                       onQtyChange={(qty) => updateQty(prenda.id, qty)}
+                      onEditClick={() => setEditingPrenda(prenda)}
                     />
                   ))}
                 </div>
@@ -201,6 +220,58 @@ export default function ArmarioPage() {
             ))}
           </div>
         </>
+      )}
+
+      {/* Edit Modal */}
+      {editingPrenda && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-0">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            onClick={() => setEditingPrenda(null)}
+          ></div>
+
+          <div className="bg-zinc-900 border border-white/10 rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl relative z-10 animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-8 fade-in overflow-hidden">
+            <button 
+              onClick={() => setEditingPrenda(null)}
+              className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 rounded-full text-zinc-400 transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-6">Opciones de la prenda</h3>
+              
+              <div className="mb-6">
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Cambiar Categoría</p>
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 pb-2">
+                  {tipos.map(t => (
+                    <button
+                      key={t}
+                      onClick={() => handleChangeTipo(t)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                        t === editingPrenda.tipo 
+                          ? "bg-cyan-500 text-white border-transparent" 
+                          : "bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10"
+                      }`}
+                    >
+                      {getEmojiForTipo(t, "w-4 h-4 inline-block mr-1")} {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="h-px bg-white/10 w-full mb-6"></div>
+
+              <button
+                onClick={handleDelete}
+                className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold py-3.5 rounded-xl border border-red-500/20 transition-all active:scale-95"
+              >
+                <Trash2 size={18} />
+                Borrar del Armario
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {selectedItems.length > 0 && (

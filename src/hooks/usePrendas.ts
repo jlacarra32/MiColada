@@ -42,13 +42,14 @@ export function usePrendas() {
     setPrendas((prev) => [newPrenda, ...prev]);
   };
 
-  const sendToLaundry = (ids: string[]) => {
+  const sendToLaundry = (items: {id: string, qty: number}[]) => {
     setPrendas((prev) =>
-      prev.map((p) =>
-        ids.includes(p.id)
-          ? { ...p, estado: "en_lavanderia", fechaEnvio: Date.now() }
-          : p
-      )
+      prev.map((p) => {
+        const found = items.find(i => i.id === p.id);
+        return found
+          ? { ...p, estado: "en_lavanderia", fechaEnvio: Date.now(), cantidadEnviada: found.qty }
+          : p;
+      })
     );
   };
 
@@ -56,10 +57,14 @@ export function usePrendas() {
     setPrendas((prev) =>
       prev.map((p) =>
         p.id === id
-          ? { ...p, estado: "en_armario", fechaEnvio: undefined }
+          ? { ...p, estado: "en_armario", fechaEnvio: undefined, cantidadEnviada: undefined }
           : p
       )
     );
+  };
+
+  const updatePrenda = (id: string, updates: Partial<Prenda>) => {
+    setPrendas(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
   };
 
   const removePrenda = (id: string) => {
@@ -73,5 +78,6 @@ export function usePrendas() {
     sendToLaundry,
     receiveFromLaundry,
     removePrenda,
+    updatePrenda,
   };
 }

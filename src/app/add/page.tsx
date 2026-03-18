@@ -102,10 +102,10 @@ export default function AddPage() {
               </div>
               <div className="text-left flex-1">
                 <p className={`text-sm font-semibold ${esMultiple ? "text-cyan-300" : "text-zinc-300"}`}>
-                  Se envía en bolsas
+                  Prenda múltiple
                 </p>
                 <p className="text-[11px] text-zinc-500 leading-tight">
-                  Podrás elegir cuántas bolsas envías cada vez
+                  Te permite enviar más de una unidad a la vez
                 </p>
               </div>
               <div className={`w-10 h-5 rounded-full relative transition-colors ${

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
@@ -7,8 +7,10 @@ import { useConfig } from "@/hooks/useConfig";
 import PrendaCard from "@/components/PrendaCard";
 import FAB from "@/components/FAB";
 import Toast from "@/components/Toast";
+import ConfirmSheet from "@/components/ConfirmSheet";
 import { WashingMachine, Settings, Search, CheckSquare, Square, Trash2, X } from "lucide-react";
 import { getEmojiForTipo } from "@/utils/icons";
+import { getColorName } from "@/utils/colors";
 import { Prenda } from "@/types";
 
 interface SelectedItem {
@@ -21,73 +23,64 @@ export default function ArmarioPage() {
   const { tipos } = useConfig();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [toast, setToast] = useState({ visible: false, message: "" });
-  
-  // Edit modal state
   const [editingPrenda, setEditingPrenda] = useState<Prenda | null>(null);
-  
-  const armarioPrendas = useMemo(
-    () => prendas.filter((p) => p.estado === "en_armario"),
-    [prendas]
-  );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const armarioPrendas = useMemo(() => prendas.filter((p) => p.estado === "en_armario"), [prendas]);
 
   const lavanderiaCount = useMemo(
     () => prendas.filter((p) => p.estado === "en_lavanderia").length,
     [prendas]
   );
 
-  const isSelected = useCallback((id: string) => {
-    return selectedItems.some(s => s.id === id);
-  }, [selectedItems]);
+  const selectedUnits = useMemo(
+    () => selectedItems.reduce((total, item) => total + item.qty, 0),
+    [selectedItems]
+  );
 
-  const getQty = useCallback((id: string) => {
-    return selectedItems.find(s => s.id === id)?.qty ?? 1;
-  }, [selectedItems]);
+  const isSelected = useCallback((id: string) => selectedItems.some((s) => s.id === id), [selectedItems]);
+
+  const getQty = useCallback((id: string) => selectedItems.find((s) => s.id === id)?.qty ?? 1, [selectedItems]);
 
   const toggleSelection = useCallback((id: string) => {
-    setSelectedItems((prev) => 
-      prev.some(s => s.id === id)
-        ? prev.filter(s => s.id !== id)
-        : [...prev, { id, qty: 1 }]
+    setSelectedItems((prev) =>
+      prev.some((s) => s.id === id) ? prev.filter((s) => s.id !== id) : [...prev, { id, qty: 1 }]
     );
   }, []);
 
   const updateQty = useCallback((id: string, qty: number) => {
-    setSelectedItems((prev) =>
-      prev.map(s => s.id === id ? { ...s, qty } : s)
-    );
+    setSelectedItems((prev) => prev.map((s) => (s.id === id ? { ...s, qty } : s)));
   }, []);
 
   const toggleSelectAll = useCallback(() => {
     if (selectedItems.length === armarioPrendas.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(armarioPrendas.map(p => ({ id: p.id, qty: 1 })));
+      setSelectedItems(armarioPrendas.map((p) => ({ id: p.id, qty: 1 })));
     }
   }, [selectedItems.length, armarioPrendas]);
 
   const handleSendToLaundry = useCallback(() => {
-    const items = selectedItems.map(s => ({ id: s.id, qty: s.qty }));
-    const count = selectedItems.length;
-    sendToLaundry(items);
+    if (selectedItems.length === 0) return;
+    sendToLaundry(selectedItems.map((item) => ({ id: item.id, qty: item.qty })));
     setSelectedItems([]);
     setToast({
       visible: true,
-      message: `¡${count} prenda${count !== 1 ? 's' : ''} enviada${count !== 1 ? 's' : ''} a lavar!`,
+      message: `${selectedUnits} unidad${selectedUnits !== 1 ? "es" : ""} enviadas a lavandería.`,
     });
-  }, [selectedItems, sendToLaundry]);
+  }, [selectedItems, selectedUnits, sendToLaundry]);
 
   const closeToast = useCallback(() => {
     setToast({ visible: false, message: "" });
   }, []);
 
-  const handleDelete = () => {
+  const confirmDelete = useCallback(() => {
     if (!editingPrenda) return;
-    if (confirm("¿Estás seguro de que deseas eliminar esta prenda?")) {
-      removePrenda(editingPrenda.id);
-      setEditingPrenda(null);
-      setToast({ visible: true, message: "Prenda eliminada correctamente." });
-    }
-  };
+    removePrenda(editingPrenda.id);
+    setShowDeleteConfirm(false);
+    setEditingPrenda(null);
+    setToast({ visible: true, message: "Prenda eliminada correctamente." });
+  }, [editingPrenda, removePrenda]);
 
   const handleChangeTipo = (newTipo: string) => {
     if (!editingPrenda) return;
@@ -96,7 +89,6 @@ export default function ArmarioPage() {
     setToast({ visible: true, message: "Categoría actualizada." });
   };
 
-  // Grouped and sorted prendas
   const { groupedPrendas, sortedKeys } = useMemo(() => {
     const grouped = armarioPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
       if (!acc[prenda.tipo]) acc[prenda.tipo] = [];
@@ -117,178 +109,221 @@ export default function ArmarioPage() {
   }, [armarioPrendas, tipos]);
 
   if (!isLoaded) {
-    return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando armario...</div>;
+    return <div className="min-h-[100dvh] p-8 text-center text-zinc-400">Cargando armario...</div>;
   }
 
   const allSelected = armarioPrendas.length > 0 && selectedItems.length === armarioPrendas.length;
 
   return (
-    <div className="min-h-full p-3 pb-28 flex flex-col gap-3 relative">
-      <header className="mb-1 mt-5 px-1 flex justify-between items-end">
-        <div>
-          <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Mi Armario</h1>
-          <p className="text-cyan-200/80 font-bold text-[10px] uppercase tracking-widest mt-0.5">
-            {armarioPrendas.length} prenda{armarioPrendas.length !== 1 && 's'} limpia{armarioPrendas.length !== 1 && 's'}
-          </p>
-        </div>
-        <div className="flex gap-1.5">
-          <Link href="/buscar" className="p-2.5 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
-            <Search size={20} strokeWidth={2.5} />
-          </Link>
-          <Link href="/ajustes" className="p-2.5 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
-            <Settings size={20} strokeWidth={2.5} />
-          </Link>
-        </div>
-      </header>
-
-      {/* Stats Summary - more compact */}
-      {prendas.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 px-0.5">
-          <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-2 flex items-center gap-2 justify-center">
-            <span className="text-lg font-black text-cyan-400 tabular-nums">{armarioPrendas.length}</span>
-            <span className="text-[9px] font-bold text-cyan-300/60 uppercase tracking-widest">En armario</span>
-          </div>
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2 flex items-center gap-2 justify-center">
-            <span className="text-lg font-black text-emerald-400 tabular-nums">{lavanderiaCount}</span>
-            <span className="text-[9px] font-bold text-emerald-300/60 uppercase tracking-widest">Lavandería</span>
-          </div>
-        </div>
-      )}
-
-      {armarioPrendas.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center mt-12 p-6 text-center">
-          <div className="relative mb-8 transition-transform hover:scale-105 duration-500">
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-blue-500 rounded-full blur-2xl opacity-40"></div>
-            <div className="bg-white/10 p-6 rounded-full shadow-lg border border-white/10 relative backdrop-blur-md">
-              <WashingMachine size={72} strokeWidth={1} className="text-cyan-400/80" />
+    <>
+      <div className="min-h-full px-4 pb-36 pt-5">
+        <header className="mb-5 flex items-start justify-between gap-4">
+          <div className="space-y-3">
+            <span className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200">
+              Armario limpio
+            </span>
+            <div>
+              <h1 className="text-[32px] font-black tracking-tight text-white">Mi Armario</h1>
+              <p className="mt-1 max-w-[16rem] text-sm leading-relaxed text-slate-300">
+                Organiza tu ropa limpia y prepara la próxima colada con menos pasos.
+              </p>
             </div>
           </div>
-          <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">¡Tu armario está vacío!</p>
-          <p className="text-base mt-3 text-zinc-400 max-w-[260px] leading-relaxed">
-            Añade ropa nueva o recibe la que ya enviaste a la lavandería.
-          </p>
-          <Link
-            href="/add"
-            className="mt-6 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold transition-all hover:-translate-y-1 active:scale-95 shadow-lg shadow-cyan-500/30 border border-white/10"
-          >
-            + Añadir primera prenda
-          </Link>
-        </div>
-      ) : (
-        <>
-          {/* Select All Bar */}
-          <div className="flex justify-between items-center px-1">
-            <button
-              onClick={toggleSelectAll}
-              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-cyan-400 transition-colors active:scale-95"
+
+          <div className="flex gap-2 pt-1">
+            <Link
+              href="/buscar"
+              aria-label="Buscar prendas"
+              className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
             >
-              {allSelected ? (
-                <CheckSquare size={14} className="text-cyan-400" />
-              ) : (
-                <Square size={14} />
+              <Search size={20} strokeWidth={2.4} />
+            </Link>
+            <Link
+              href="/ajustes"
+              aria-label="Abrir ajustes"
+              className="rounded-2xl border border-cyan-200/20 bg-cyan-400/12 p-3 text-cyan-100 shadow-[0_12px_26px_rgba(34,211,238,0.18)] transition-all active:scale-95"
+            >
+              <Settings size={20} strokeWidth={2.4} />
+            </Link>
+          </div>
+        </header>
+
+        {prendas.length > 0 && (
+          <section className="mb-5 grid grid-cols-2 gap-3">
+            <div className="rounded-[28px] border border-cyan-400/18 bg-cyan-400/10 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200/80">En armario</p>
+              <div className="mt-3 flex items-end justify-between gap-3">
+                <span className="text-3xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
+                <span className="text-xs text-cyan-100/80">listas para usar</span>
+              </div>
+            </div>
+            <div className="rounded-[28px] border border-emerald-400/18 bg-emerald-400/10 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Lavandería</p>
+              <div className="mt-3 flex items-end justify-between gap-3">
+                <span className="text-3xl font-black text-white tabular-nums">{lavanderiaCount}</span>
+                <span className="text-xs text-emerald-100/80">en proceso</span>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {armarioPrendas.length === 0 ? (
+          <div className="mt-8 flex flex-col items-center rounded-[32px] border border-white/10 bg-white/6 px-6 py-10 text-center backdrop-blur-xl">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 rounded-full bg-cyan-400/30 blur-2xl" />
+              <div className="relative rounded-full border border-white/10 bg-white/10 p-6">
+                <WashingMachine size={68} strokeWidth={1.2} className="text-cyan-300" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Tu armario está vacío</h2>
+            <p className="mt-3 max-w-[17rem] text-sm leading-relaxed text-zinc-300">
+              Añade ropa nueva o recupera prendas desde la lavandería para empezar a usar la app con ritmo.
+            </p>
+            <Link
+              href="/add"
+              className="mt-6 rounded-2xl border border-cyan-200/20 bg-gradient-to-r from-cyan-400 to-sky-500 px-5 py-3 font-bold text-white shadow-[0_14px_30px_rgba(34,211,238,0.28)] transition-all active:scale-95"
+            >
+              Añadir primera prenda
+            </Link>
+          </div>
+        ) : (
+          <>
+            <section className="mb-5 rounded-[28px] border border-white/10 bg-white/6 p-3.5 backdrop-blur-xl">
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  onClick={toggleSelectAll}
+                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-200 transition-all active:scale-95"
+                >
+                  {allSelected ? <CheckSquare size={15} className="text-cyan-300" /> : <Square size={15} />}
+                  {allSelected ? "Limpiar selección" : "Seleccionar todo"}
+                </button>
+                {selectedItems.length > 0 ? (
+                  <span className="text-xs font-semibold text-cyan-200">
+                    {selectedItems.length} prenda{selectedItems.length !== 1 ? "s" : ""}
+                  </span>
+                ) : (
+                  <span className="text-xs text-zinc-400">Toca las tarjetas para preparar tu colada</span>
+                )}
+              </div>
+              {selectedItems.length > 0 && (
+                <p className="mt-2 text-sm text-zinc-300">
+                  Has seleccionado {selectedUnits} unidad{selectedUnits !== 1 ? "es" : ""} para enviar a lavar.
+                </p>
               )}
-              {allSelected ? "Deseleccionar" : "Seleccionar todo"}
-            </button>
-            {selectedItems.length > 0 && (
-              <span className="text-[10px] font-bold text-cyan-400 tabular-nums">
-                {selectedItems.length} sel.
-              </span>
-            )}
-          </div>
+            </section>
 
-          <div className="flex flex-col gap-5">
-            {sortedKeys.map((tipoKey) => (
-              <div key={tipoKey} className="flex flex-col gap-2">
-                <h2 className="text-xs font-black text-white/45 uppercase tracking-[0.16em] px-1 flex items-center gap-2">
-                  {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
-                </h2>
-                <div className="grid grid-cols-3 gap-2">
-                  {groupedPrendas[tipoKey].map((prenda) => (
-                    <PrendaCard
-                      key={prenda.id}
-                      prenda={prenda}
-                      compact
-                      smallPreviewIcon
-                      hideTipoLabel
-                      selected={isSelected(prenda.id)}
-                      selectedQty={getQty(prenda.id)}
-                      onClick={() => toggleSelection(prenda.id)}
-                      onQtyChange={(qty) => updateQty(prenda.id, qty)}
-                      onEditClick={() => setEditingPrenda(prenda)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Edit Modal */}
-      {editingPrenda && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-0">
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
-            onClick={() => setEditingPrenda(null)}
-          ></div>
-
-          <div className="bg-zinc-900 border border-white/10 rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl relative z-10 animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-8 fade-in overflow-hidden">
-            <button 
-              onClick={() => setEditingPrenda(null)}
-              className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 rounded-full text-zinc-400 transition-colors"
-            >
-              <X size={20} />
-            </button>
-            
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-white mb-6">Opciones de la prenda</h3>
-              
-              <div className="mb-6">
-                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Cambiar Categoría</p>
-                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 pb-2">
-                  {tipos.map(t => (
-                    <button
-                      key={t}
-                      onClick={() => handleChangeTipo(t)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                        t === editingPrenda.tipo 
-                          ? "bg-cyan-500 text-white border-transparent" 
-                          : "bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10"
-                      }`}
-                    >
-                      {getEmojiForTipo(t, "w-4 h-4 inline-block mr-1")} {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="h-px bg-white/10 w-full mb-6"></div>
-
-              <button
-                onClick={handleDelete}
-                className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold py-3.5 rounded-xl border border-red-500/20 transition-all active:scale-95"
-              >
-                <Trash2 size={18} />
-                Borrar del Armario
-              </button>
+            <div className="space-y-5">
+              {sortedKeys.map((tipoKey) => (
+                <section key={tipoKey} className="space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.16em] text-white/70">
+                      {getEmojiForTipo(tipoKey, "h-5 w-5 opacity-100 normal-case")}
+                      <span>{tipoKey}</span>
+                    </h2>
+                    <span className="rounded-full bg-white/8 px-2.5 py-1 text-[11px] font-bold text-zinc-300">
+                      {groupedPrendas[tipoKey].length}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {groupedPrendas[tipoKey].map((prenda) => (
+                      <PrendaCard
+                        key={prenda.id}
+                        prenda={prenda}
+                        compact
+                        selected={isSelected(prenda.id)}
+                        selectedQty={getQty(prenda.id)}
+                        onClick={() => toggleSelection(prenda.id)}
+                        onQtyChange={(qty) => updateQty(prenda.id, qty)}
+                        onEditClick={() => setEditingPrenda(prenda)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
+          </>
+        )}
+      </div>
+
+      {editingPrenda && (
+        <div className="fixed inset-0 z-[110] flex items-end justify-center">
+          <button
+            type="button"
+            aria-label="Cerrar edición"
+            onClick={() => setEditingPrenda(null)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+
+          <div className="relative z-10 w-full rounded-t-[32px] border border-white/10 bg-[#07192b] px-5 pb-8 pt-5 shadow-[0_-18px_44px_rgba(0,0,0,0.5)]">
+            <div className="mx-auto mb-5 h-1.5 w-14 rounded-full bg-white/12" />
+            <button
+              onClick={() => setEditingPrenda(null)}
+              className="absolute right-4 top-4 rounded-full bg-white/8 p-2 text-zinc-400 transition-colors hover:text-white"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mb-6 flex items-center gap-3 pr-10">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/8">
+                {getEmojiForTipo(editingPrenda.tipo, "h-8 w-8")}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">
+                  {editingPrenda.detalle ? `\"${editingPrenda.detalle}\"` : editingPrenda.tipo}
+                </h3>
+                <p className="text-sm text-zinc-300">{getColorName(editingPrenda.color)}</p>
+              </div>
+            </div>
+
+            <div className="mb-6 rounded-[28px] border border-white/10 bg-white/6 p-4">
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400">Cambiar categoría</p>
+              <div className="flex max-h-52 flex-wrap gap-2 overflow-y-auto pr-2">
+                {tipos.map((tipo) => (
+                  <button
+                    key={tipo}
+                    onClick={() => handleChangeTipo(tipo)}
+                    className={`rounded-2xl border px-3.5 py-2 text-sm font-semibold transition-all active:scale-95 ${
+                      tipo === editingPrenda.tipo
+                        ? "border-cyan-300/40 bg-cyan-400/16 text-cyan-100"
+                        : "border-white/10 bg-white/6 text-zinc-200"
+                    }`}
+                  >
+                    <span className="mr-1 inline-flex align-middle">{getEmojiForTipo(tipo, "h-4 w-4")}</span>
+                    {tipo}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-400/18 bg-red-500/12 py-3.5 font-bold text-red-300 transition-all active:scale-[0.98]"
+            >
+              <Trash2 size={18} />
+              Eliminar prenda
+            </button>
           </div>
         </div>
       )}
+
+      <ConfirmSheet
+        open={showDeleteConfirm}
+        title="Eliminar prenda"
+        description="La prenda se quitará de tu armario y no podrás recuperarla después."
+        confirmLabel="Eliminar"
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDelete}
+      />
 
       {selectedItems.length > 0 && (
-        <FAB 
-          label={`Enviar ${selectedItems.length} a lavar`}
+        <FAB
+          label={`Enviar ${selectedUnits} a lavar`}
           onClick={handleSendToLaundry}
           icon={<WashingMachine size={20} />}
         />
       )}
 
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        onClose={closeToast}
-      />
-    </div>
+      <Toast visible={toast.visible} message={toast.message} onClose={closeToast} />
+    </>
   );
 }

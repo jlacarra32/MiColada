@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 import clsx from "clsx";
-import { getColorStyle, getColorName } from "@/utils/colors";
+import { getColorName, getColorStyle } from "@/utils/colors";
 import { getEmojiForTipo } from "@/utils/icons";
 
 interface ChipProps {
@@ -18,31 +18,32 @@ export default function Chip({ label, selected, onClick, isColorChip }: ChipProp
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       style={
-        isColorChip 
+        isColorChip
           ? {
               background: selected ? colorStyle!.background : "rgba(255,255,255,0.05)",
               color: selected ? colorStyle!.color : "#cbd5e1",
-              borderColor: selected ? (colorStyle!.border || 'rgba(255,255,255,0.2)') : "rgba(255,255,255,0.1)"
+              borderColor: selected ? colorStyle!.border || "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.1)",
             }
           : undefined
       }
       className={clsx(
-        "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-in-out hover:-translate-y-1 active:scale-95 inline-flex whitespace-nowrap items-center gap-2",
-        !isColorChip && selected && "bg-cyan-500 text-white shadow-md shadow-cyan-500/40 border-transparent",
-        !isColorChip && !selected && "bg-white/5 text-zinc-300 border border-white/10 hover:border-white/20 hover:bg-white/10",
+        "inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-2xl border px-4 py-2.5 text-[13px] font-semibold transition-all duration-300 ease-out active:scale-95",
+        !isColorChip && selected && "border-cyan-300/50 bg-gradient-to-r from-cyan-400 to-sky-500 text-white shadow-[0_10px_25px_rgba(34,211,238,0.25)]",
+        !isColorChip && !selected && "border-white/10 bg-white/6 text-zinc-200 hover:border-white/20 hover:bg-white/10",
         isColorChip && "border",
-        isColorChip && selected && "shadow-md shadow-black/30",
+        isColorChip && selected && "shadow-[0_10px_22px_rgba(0,0,0,0.26)]",
         isColorChip && !selected && "hover:bg-white/10"
       )}
     >
       {isColorChip ? (
-        <span 
-          className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0 shadow-inner" 
-          style={{ background: colorStyle!.background }} 
+        <span
+          className="h-3.5 w-3.5 shrink-0 rounded-full border border-black/20 shadow-inner"
+          style={{ background: colorStyle!.background }}
         />
       ) : (
-        getEmojiForTipo(label, "w-5 h-5")
+        getEmojiForTipo(label, "h-5 w-5")
       )}
       {displayName}
     </button>

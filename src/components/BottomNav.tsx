@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,23 +11,32 @@ export default function BottomNav() {
   const navItems = [
     { label: "Armario", href: "/", icon: Shirt },
     { label: "Añadir", href: "/add", icon: PlusCircle, special: true },
-    { label: "Lavandería", href: "/lavanderia", icon: WashingMachine },
+    { label: "Lavandería", href: "/Lavandería", icon: WashingMachine },
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full max-w-md mx-auto bg-zinc-900/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-8px_30px_rgb(0,0,0,0.4)] pb-safe z-50">
-      <div className="flex justify-around items-center h-[72px]">
+    <nav
+      aria-label="Navegación principal"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-4"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.85rem)" }}
+    >
+      <div className="flex h-[76px] items-center justify-around rounded-[28px] border border-white/10 bg-[#07192b]/92 px-2 shadow-[0_18px_45px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
 
           if (item.special) {
             return (
-              <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center -mt-7 group relative z-10 w-20">
-                <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-3.5 rounded-full shadow-lg shadow-cyan-500/30 transition-all duration-300 ease-in-out group-hover:-translate-y-1 group-active:scale-95 border border-white/10">
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-label="Añadir una nueva prenda"
+                className="group relative z-10 -mt-7 flex w-20 flex-col items-center justify-center"
+              >
+                <div className="rounded-[22px] border border-cyan-200/20 bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 p-4 text-white shadow-[0_14px_30px_rgba(14,165,233,0.38)] transition-all duration-300 ease-out group-active:scale-95">
                   <Icon size={30} strokeWidth={2.5} />
                 </div>
-                <span className="text-xs font-bold text-zinc-400 mt-1 transition-colors group-hover:text-cyan-400">{item.label}</span>
+                <span className="mt-1 text-[11px] font-bold tracking-wide text-zinc-300 transition-colors group-hover:text-cyan-300">{item.label}</span>
               </Link>
             );
           }
@@ -36,20 +45,21 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={clsx(
-                "flex flex-col items-center justify-center w-20 transition-all duration-300 ease-in-out group relative",
-                isActive ? "text-cyan-400" : "text-zinc-500 hover:text-zinc-300"
+                "group relative flex w-20 flex-col items-center justify-center transition-all duration-300 ease-out",
+                isActive ? "text-cyan-300" : "text-zinc-500 hover:text-zinc-200"
               )}
             >
               <div
                 className={clsx(
-                  "p-2.5 rounded-full transition-all duration-300 ease-in-out group-hover:-translate-y-1 group-active:scale-95",
-                  isActive && "bg-cyan-400/10"
+                  "rounded-2xl p-2.5 transition-all duration-300 ease-out group-active:scale-95",
+                  isActive && "bg-cyan-400/12 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.12)]"
                 )}
               >
                 <Icon size={27} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span className={clsx("text-xs mt-0.5 font-medium transition-colors", isActive && "font-bold text-cyan-400")}>
+              <span className={clsx("mt-0.5 text-[11px] font-semibold transition-colors", isActive && "font-bold text-cyan-200")}>
                 {item.label}
               </span>
             </Link>

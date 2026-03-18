@@ -1,14 +1,7 @@
-"use client";
+﻿"use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-/**
- * Advanced background removal with global cache.
- * Analyzes the corners to detect the background color and removes it with a fuzz factor.
- * Processed images are cached globally to avoid re-processing on re-renders.
- */
-
-// Global cache for processed icons — persists across component instances and re-renders
 const iconCache = new Map<string, string>();
 
 interface TransparentIconProps {
@@ -18,25 +11,21 @@ interface TransparentIconProps {
 }
 
 export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) => {
-  const [processedSrc, setProcessedSrc] = useState<string | null>(() => {
-    // Check cache synchronously on mount
-    return iconCache.get(src) || null;
-  });
+  const cachedSrc = iconCache.get(src) || null;
+  const [processedSrc, setProcessedSrc] = useState<string | null>(cachedSrc);
 
   useEffect(() => {
-    // If already cached, set immediately and skip processing
     if (iconCache.has(src)) {
-      setProcessedSrc(iconCache.get(src)!);
       return;
     }
 
     let isMounted = true;
     const img = new Image();
     img.src = src;
-    
+
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       canvas.width = img.width;
@@ -45,20 +34,27 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
-
-      // Sample corners to get the likely background color
       const corners = [
-        [0, 0], [canvas.width - 1, 0], [0, canvas.height - 1], [canvas.width - 1, canvas.height - 1]
+        [0, 0],
+        [canvas.width - 1, 0],
+        [0, canvas.height - 1],
+        [canvas.width - 1, canvas.height - 1],
       ];
-      
-      let bgR = 0, bgG = 0, bgB = 0;
+
+      let bgR = 0;
+      let bgG = 0;
+      let bgB = 0;
+
       corners.forEach(([x, y]) => {
         const idx = (y * canvas.width + x) * 4;
         bgR += data[idx];
         bgG += data[idx + 1];
         bgB += data[idx + 2];
       });
-      bgR /= 4; bgG /= 4; bgB /= 4;
+
+      bgR /= 4;
+      bgG /= 4;
+      bgB /= 4;
 
       const threshold = 60;
 
@@ -66,12 +62,7 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
-        
-        const diff = Math.sqrt(
-          Math.pow(r - bgR, 2) + 
-          Math.pow(g - bgG, 2) + 
-          Math.pow(b - bgB, 2)
-        );
+        const diff = Math.sqrt(Math.pow(r - bgR, 2) + Math.pow(g - bgG, 2) + Math.pow(b - bgB, 2));
 
         if (diff < threshold) {
           data[i + 3] = 0;
@@ -82,10 +73,8 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
 
       ctx.putImageData(imageData, 0, 0);
       const dataUrl = canvas.toDataURL();
-      
-      // Store in global cache
       iconCache.set(src, dataUrl);
-      
+
       if (isMounted) {
         setProcessedSrc(dataUrl);
       }
@@ -96,16 +85,15 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
     };
   }, [src]);
 
+  const finalSrc = processedSrc || cachedSrc;
+
   return (
-    <div className={className || "w-10 h-10 relative flex items-center justify-center shrink-0"}>
-      {processedSrc ? (
-        <img 
-          src={processedSrc} 
-          alt={alt} 
-          className="w-full h-full object-contain drop-shadow-md"
-        />
+    <div className={className || "relative flex h-10 w-10 shrink-0 items-center justify-center"}>
+      {finalSrc ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={finalSrc} alt={alt} className="h-full w-full object-contain drop-shadow-md" />
       ) : (
-        <div className="w-full h-full bg-white/10 animate-pulse rounded-full" />
+        <div className="h-full w-full animate-pulse rounded-full bg-white/10" />
       )}
     </div>
   );

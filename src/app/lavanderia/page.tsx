@@ -3,17 +3,14 @@
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePrendas } from "@/hooks/usePrendas";
-import { useConfig } from "@/hooks/useConfig";
 import PrendaCard from "@/components/PrendaCard";
 import TimeAgoText from "@/components/TimeAgoText";
 import Toast from "@/components/Toast";
 import FAB from "@/components/FAB";
-import { WashingMachine, Settings, Search, CheckCircle2, Waves, PackageCheck } from "lucide-react";
-import { getEmojiForTipo } from "@/utils/icons";
+import { Settings, Search, CheckCircle2, Waves, PackageCheck } from "lucide-react";
 
 export default function LavanderiaPage() {
   const { prendas, isLoaded, receiveFromLaundry } = usePrendas();
-  const { tipos } = useConfig();
   const [toast, setToast] = useState({ visible: false, message: "" });
   
   const lavanderiaPrendas = useMemo(
@@ -29,10 +26,10 @@ export default function LavanderiaPage() {
 
   const handleReceiveAll = useCallback(() => {
     const count = lavanderiaPrendas.length;
-    lavanderiaPrendas.forEach(p => receiveFromLaundry(p.id));
+    lavanderiaPrendas.forEach((p) => receiveFromLaundry(p.id));
     setToast({
       visible: true,
-      message: `¡${count} prenda${count !== 1 ? 's' : ''} recibida${count !== 1 ? 's' : ''}!`,
+      message: `¡${count} prenda${count !== 1 ? "s" : ""} recibida${count !== 1 ? "s" : ""}!`,
     });
   }, [lavanderiaPrendas, receiveFromLaundry]);
 
@@ -40,49 +37,29 @@ export default function LavanderiaPage() {
     receiveFromLaundry(id);
     setToast({
       visible: true,
-      message: "¡Prenda recibida! 🎉",
+      message: "¡Prenda recibida!",
     });
   }, [receiveFromLaundry]);
 
-  // Grouped and sorted
-  const { groupedPrendas, sortedKeys } = useMemo(() => {
-    const grouped = lavanderiaPrendas.reduce<Record<string, typeof prendas>>((acc, prenda) => {
-      if (!acc[prenda.tipo]) acc[prenda.tipo] = [];
-      acc[prenda.tipo].push(prenda);
-      return acc;
-    }, {});
-
-    const keys = Object.keys(grouped).sort((a, b) => {
-      const idxA = tipos.indexOf(a);
-      const idxB = tipos.indexOf(b);
-      if (idxA === -1 && idxB === -1) return a.localeCompare(b);
-      if (idxA === -1) return 1;
-      if (idxB === -1) return -1;
-      return idxA - idxB;
-    });
-
-    return { groupedPrendas: grouped, sortedKeys: keys };
-  }, [lavanderiaPrendas, tipos]);
-
   if (!isLoaded) {
-    return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando lavandería...</div>;
+    return <div className="p-8 text-center text-zinc-500 min-h-[100dvh]">Cargando lavanderia...</div>;
   }
 
   return (
     <div className="min-h-full p-3 pb-28 flex flex-col gap-3">
       <header className="mb-2 mt-5 px-1 flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Lavandería</h1>
+          <h1 className="text-2xl font-black text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Lavanderia</h1>
           <p className="text-emerald-300/80 font-bold text-[10px] uppercase tracking-widest mt-0.5">
-            {lavanderiaPrendas.length} prenda{lavanderiaPrendas.length !== 1 && 's'} lavándose
+            {lavanderiaPrendas.length} prenda{lavanderiaPrendas.length !== 1 && "s"} lavandose
           </p>
         </div>
         <div className="flex gap-1.5">
-          <Link href="/buscar" className="p-2 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
-            <Search size={18} strokeWidth={2.5} />
+          <Link href="/buscar" className="p-2.5 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
+            <Search size={20} strokeWidth={2.5} />
           </Link>
-          <Link href="/ajustes" className="p-2 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
-            <Settings size={18} strokeWidth={2.5} />
+          <Link href="/ajustes" className="p-2.5 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
+            <Settings size={20} strokeWidth={2.5} />
           </Link>
         </div>
       </header>
@@ -97,40 +74,33 @@ export default function LavanderiaPage() {
           </div>
           <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">¡Todo limpio y en su sitio!</p>
           <p className="text-base mt-3 text-zinc-400 max-w-[260px] leading-relaxed">
-            No tienes ropa en la lavandería en este momento.
+            No tienes ropa en la lavanderia en este momento.
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
-          {sortedKeys.map((tipoKey) => (
-            <div key={tipoKey} className="flex flex-col gap-2">
-              <h2 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] px-1 flex items-center gap-1.5">
-                {getEmojiForTipo(tipoKey, "w-3.5 h-3.5 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-emerald-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
-              </h2>
-              <div className="grid grid-cols-3 gap-2">
-                {groupedPrendas[tipoKey].map((prenda) => (
-                  <PrendaCard
-                    key={prenda.id}
-                    prenda={prenda}
-                    compact
-                    actionButton={
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleReceiveOne(prenda.id);
-                        }}
-                        className="w-full flex items-center justify-center gap-1 text-emerald-500 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[8px] uppercase tracking-wider"
-                      >
-                        <CheckCircle2 size={10} />
-                        Recibido
-                      </button>
-                    }
-                  >
-                    {prenda.fechaEnvio && <TimeAgoText timestamp={prenda.fechaEnvio} />}
-                  </PrendaCard>
-                ))}
-              </div>
-            </div>
+        <div className="grid grid-cols-3 gap-2">
+          {lavanderiaPrendas.map((prenda) => (
+            <PrendaCard
+              key={prenda.id}
+              prenda={prenda}
+              compact
+              smallPreviewIcon
+              hideTipoLabel
+              actionButton={
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReceiveOne(prenda.id);
+                  }}
+                  className="w-full flex items-center justify-center gap-1 text-emerald-500 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group font-bold text-[8px] uppercase tracking-wider"
+                >
+                  <CheckCircle2 size={10} />
+                  Recibido
+                </button>
+              }
+            >
+              {prenda.fechaEnvio && <TimeAgoText timestamp={prenda.fechaEnvio} />}
+            </PrendaCard>
           ))}
         </div>
       )}

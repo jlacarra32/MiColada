@@ -132,11 +132,11 @@ export default function ArmarioPage() {
           </p>
         </div>
         <div className="flex gap-1.5">
-          <Link href="/buscar" className="p-2 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
-            <Search size={18} strokeWidth={2.5} />
+          <Link href="/buscar" className="p-2.5 bg-zinc-800 text-zinc-300 rounded-xl transition-all active:scale-90 border border-white/5">
+            <Search size={20} strokeWidth={2.5} />
           </Link>
-          <Link href="/ajustes" className="p-2 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
-            <Settings size={18} strokeWidth={2.5} />
+          <Link href="/ajustes" className="p-2.5 bg-cyan-500 text-white rounded-xl transition-all active:scale-90 shadow-[0_4px_15px_rgba(6,182,212,0.4)] border border-cyan-400">
+            <Settings size={20} strokeWidth={2.5} />
           </Link>
         </div>
       </header>
@@ -199,8 +199,8 @@ export default function ArmarioPage() {
           <div className="flex flex-col gap-5">
             {sortedKeys.map((tipoKey) => (
               <div key={tipoKey} className="flex flex-col gap-2">
-                <h2 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] px-1 flex items-center gap-1.5">
-                  {getEmojiForTipo(tipoKey, "w-3.5 h-3.5 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
+                <h2 className="text-xs font-black text-white/45 uppercase tracking-[0.16em] px-1 flex items-center gap-2">
+                  {getEmojiForTipo(tipoKey, "w-4 h-4 opacity-100 normal-case")} {tipoKey} <span className="w-1 h-1 rounded-full bg-cyan-500/30"></span> <span>{groupedPrendas[tipoKey].length}</span>
                 </h2>
                 <div className="grid grid-cols-3 gap-2">
                   {groupedPrendas[tipoKey].map((prenda) => (
@@ -208,6 +208,8 @@ export default function ArmarioPage() {
                       key={prenda.id}
                       prenda={prenda}
                       compact
+                      smallPreviewIcon
+                      hideTipoLabel
                       selected={isSelected(prenda.id)}
                       selectedQty={getQty(prenda.id)}
                       onClick={() => toggleSelection(prenda.id)}

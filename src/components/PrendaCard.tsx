@@ -19,16 +19,34 @@ interface Props {
   actionButton?: React.ReactNode;
   children?: React.ReactNode;
   compact?: boolean;
+  smallPreviewIcon?: boolean;
+  hideTipoLabel?: boolean;
 }
 
-export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQtyChange, onEditClick, actionButton, children, compact = false }: Props) {
+export default function PrendaCard({
+  prenda,
+  selected,
+  selectedQty,
+  onClick,
+  onQtyChange,
+  onEditClick,
+  actionButton,
+  children,
+  compact = false,
+  smallPreviewIcon = false,
+  hideTipoLabel = false,
+}: Props) {
   const colorStyle = getColorStyle(prenda.color);
   const textColor = colorStyle.isDark ? "text-white" : "text-black";
   const mutedText = colorStyle.isDark ? "text-white/70" : "text-black/60";
   const iconBg = colorStyle.isDark ? "bg-white/10" : "bg-black/5";
 
-  const iconSize = compact ? "w-8 h-8" : "w-7 h-7";
-  const containerIconSize = compact ? "w-10 h-10" : "w-9 h-9";
+  const iconSize = compact
+    ? (smallPreviewIcon ? "w-6 h-6" : "w-8 h-8")
+    : (smallPreviewIcon ? "w-6 h-6" : "w-7 h-7");
+  const containerIconSize = compact
+    ? (smallPreviewIcon ? "w-8 h-8" : "w-10 h-10")
+    : (smallPreviewIcon ? "w-8 h-8" : "w-9 h-9");
 
   return (
     <div
@@ -71,12 +89,14 @@ export default function PrendaCard({ prenda, selected, selectedQty, onClick, onQ
               &quot;{prenda.detalle}&quot;
             </h3>
           ) : (
-            <h3 className={clsx("font-bold leading-tight line-clamp-1 opacity-90", compact ? "text-[10px]" : "text-xs")}>
-              {prenda.tipo}
-            </h3>
+            !hideTipoLabel && (
+              <h3 className={clsx("font-bold leading-tight line-clamp-1 opacity-90", compact ? "text-[10px]" : "text-xs")}>
+                {prenda.tipo}
+              </h3>
+            )
           )}
           
-          {prenda.detalle && (
+          {prenda.detalle && !hideTipoLabel && (
             <p className={clsx("uppercase tracking-[0.1em] font-black opacity-40", mutedText, compact ? "text-[7px]" : "text-[9px]")}>
               {prenda.tipo}
             </p>

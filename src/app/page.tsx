@@ -149,19 +149,19 @@ export default function ArmarioPage() {
         </header>
 
         {prendas.length > 0 && (
-          <section className="mb-5 grid grid-cols-2 gap-3">
-            <div className="rounded-[28px] border border-cyan-400/18 bg-cyan-400/10 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-200/80">En armario</p>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <span className="text-2xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
-                <span className="text-xs text-cyan-100/80">listas para usar</span>
+          <section className="mb-4 grid grid-cols-2 gap-2.5">
+            <div className="rounded-[24px] border border-cyan-400/18 bg-cyan-400/10 p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200/80">En armario</p>
+              <div className="mt-2 flex items-end justify-between gap-2">
+                <span className="text-xl font-black text-white tabular-nums">{armarioPrendas.length}</span>
+                <span className="text-[10px] text-cyan-100/80">listas para usar</span>
               </div>
             </div>
-            <div className="rounded-[28px] border border-emerald-400/18 bg-emerald-400/10 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Lavandería</p>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <span className="text-2xl font-black text-white tabular-nums">{lavanderiaCount}</span>
-                <span className="text-xs text-emerald-100/80">en proceso</span>
+            <div className="rounded-[24px] border border-emerald-400/18 bg-emerald-400/10 p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Lavandería</p>
+              <div className="mt-2 flex items-end justify-between gap-2">
+                <span className="text-xl font-black text-white tabular-nums">{lavanderiaCount}</span>
+                <span className="text-[10px] text-emerald-100/80">en proceso</span>
               </div>
             </div>
           </section>
@@ -188,31 +188,31 @@ export default function ArmarioPage() {
           </div>
         ) : (
           <>
-            <section className="mb-5 rounded-[28px] border border-white/10 bg-white/6 p-3.5 backdrop-blur-xl">
-              <div className="flex items-center justify-between gap-3">
+            <section className="mb-4 rounded-2xl border border-white/10 bg-white/6 p-3">
+              <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={toggleSelectAll}
-                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-200 transition-all active:scale-95"
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-200 transition-all active:scale-95"
                 >
-                  {allSelected ? <CheckSquare size={15} className="text-cyan-300" /> : <Square size={15} />}
+                  {allSelected ? <CheckSquare size={14} className="text-cyan-300" /> : <Square size={14} />}
                   {allSelected ? "Limpiar selección" : "Seleccionar todo"}
                 </button>
                 {selectedItems.length > 0 ? (
-                  <span className="text-xs font-semibold text-cyan-200">
+                  <span className="text-[11px] font-semibold text-cyan-200">
                     {selectedItems.length} prenda{selectedItems.length !== 1 ? "s" : ""}
                   </span>
                 ) : (
-                  <span className="text-xs text-zinc-400">Toca las tarjetas para preparar tu colada</span>
+                  <span className="text-[11px] text-zinc-400">Toca las tarjetas para preparar tu colada</span>
                 )}
               </div>
               {selectedItems.length > 0 && (
-                <p className="mt-2 text-sm text-zinc-300">
-                  Has seleccionado {selectedUnits} unidad{selectedUnits !== 1 ? "es" : ""} para enviar a lavar.
+                <p className="mt-1.5 text-xs text-zinc-300">
+                  Has seleccionado {selectedUnits} unidad{selectedUnits !== 1 ? "es" : ""} para lavar.
                 </p>
               )}
             </section>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               {sortedKeys.map((tipoKey) => (
                 <section key={tipoKey} className="space-y-3">
                   <div className="flex items-center justify-between px-1">

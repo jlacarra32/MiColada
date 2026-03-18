@@ -66,13 +66,12 @@ export default function PrendaCard({
         textColor
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_55%)] opacity-70" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[size:10px_10px] opacity-[0.05]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-60" />
 
       <div className="relative flex w-full flex-col">
         <div className="relative flex w-full flex-row items-center gap-3">
           <div className={clsx(containerIconSize, "relative flex-shrink-0 flex items-center justify-center")}>
-            <div className="absolute inset-0 scale-125 rounded-full bg-white/10 blur-xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100" />
+            <div className="absolute inset-0 scale-125 rounded-full bg-white/5 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
 
             <div className={clsx("flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/12 transition-transform duration-500 group-hover/card:scale-105", iconBg)}>
               {getEmojiForTipo(prenda.tipo, iconSize)}

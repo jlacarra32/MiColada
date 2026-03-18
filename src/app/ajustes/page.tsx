@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -12,6 +12,20 @@ type PendingRemoval =
   | { kind: "tipo"; value: string }
   | { kind: "color"; value: string }
   | null;
+
+const SPANISH_COLORS: Record<string, string> = {
+  rojo: "#ef4444", azul: "#3b82f6", verde: "#22c55e", amarillo: "#eab308", 
+  naranja: "#f97316", morado: "#a855f7", rosa: "#ec4899", fucsia: "#d946ef",
+  blanco: "#ffffff", negro: "#000000", gris: "#71717a", marron: "#78350f",
+  "marrón": "#78350f", beige: "#f5f5dc", celeste: "#38bdf8", turquesa: "#2dd4bf",
+  cian: "#06b6d4", lima: "#84cc16", marino: "#1e3a8a", "azul marino": "#1e3a8a",
+  vino: "#881337", burdeos: "#881337", lila: "#d8b4e2", violeta: "#8b5cf6",
+  crema: "#fef3c7", arena: "#d6d3d1", mostaza: "#ca8a04", coral: "#f43f5e",
+  salmon: "#fb7185", "salmón": "#fb7185", esmeralda: "#10b981", oliva: "#4d7c0f",
+  plata: "#a1a1aa", oro: "#fbbf24", dorado: "#fbbf24", "azul noche": "#172554",
+  caqui: "#f0e68c", pistacho: "#93c572", menta: "#98ff98", cebra: "#ffffff",
+  "verde militar": "#4b5320", granate: "#800000", añil: "#4b0082",
+};
 
 export default function ConfigPage() {
   const { tipos, colores, isLoaded, addTipo, removeTipo, addColor, removeColor } = useConfig();
@@ -160,7 +174,14 @@ export default function ConfigPage() {
               <input
                 type="text"
                 value={newColor}
-                onChange={(e) => setNewColor(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setNewColor(val);
+                  const lowerName = val.trim().toLowerCase();
+                  if (SPANISH_COLORS[lowerName]) {
+                    setNewHex(SPANISH_COLORS[lowerName]);
+                  }
+                }}
                 placeholder="Ej: fucsia, arena, azul noche..."
                 className="flex-1 bg-transparent px-2 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none"
               />

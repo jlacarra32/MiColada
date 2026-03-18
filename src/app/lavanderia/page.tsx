@@ -95,17 +95,16 @@ export default function LavanderiaPage() {
           </div>
         ) : (
           <>
-            <section className="mb-5 rounded-[28px] border border-white/10 bg-white/6 p-4 backdrop-blur-xl">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-200/80">Resumen de colada</p>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <div>
-                  <p className="text-2xl font-black text-white tabular-nums">{lavanderiaPrendas.length}</p>
-                  <p className="mt-1 text-sm text-zinc-300">prendas esperando a ser recibidas</p>
+            <section className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/6 px-4 py-2.5">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-200/80">Prendas</span>
+                  <span className="text-[14px] font-black text-white tabular-nums">{lavanderiaPrendas.length}</span>
                 </div>
                 {lavanderiaPrendas[0]?.fechaEnvio && (
-                  <div className="rounded-2xl bg-white/6 px-3 py-2 text-right">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400">Último envío</p>
-                    <TimeAgoText timestamp={lavanderiaPrendas[0].fechaEnvio} />
+                  <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">Envío</span>
+                    <span className="text-[12px] font-semibold text-white"><TimeAgoText timestamp={lavanderiaPrendas[0].fechaEnvio} /></span>
                   </div>
                 )}
               </div>

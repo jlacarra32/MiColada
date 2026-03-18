@@ -182,28 +182,21 @@ export default function ArmarioPage() {
           </div>
         ) : (
           <>
-            <section className="mb-4 rounded-2xl border border-white/10 bg-white/6 p-3">
+            <section className="mb-4 rounded-2xl border border-white/10 bg-white/6 px-3 py-2">
               <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={toggleSelectAll}
-                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-200 transition-all active:scale-95"
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-200 transition-all active:scale-95"
                 >
-                  {allSelected ? <CheckSquare size={14} className="text-cyan-300" /> : <Square size={14} />}
+                  {allSelected ? <CheckSquare size={13} className="text-cyan-300" /> : <Square size={13} />}
                   {allSelected ? "Limpiar selección" : "Seleccionar todo"}
                 </button>
-                {selectedItems.length > 0 ? (
+                {selectedItems.length > 0 && (
                   <span className="text-[11px] font-semibold text-cyan-200">
-                    {selectedItems.length} prenda{selectedItems.length !== 1 ? "s" : ""}
+                    {selectedUnits} uds a lavar
                   </span>
-                ) : (
-                  <span className="text-[11px] text-zinc-400">Toca las tarjetas para preparar tu colada</span>
                 )}
               </div>
-              {selectedItems.length > 0 && (
-                <p className="mt-1.5 text-xs text-zinc-300">
-                  Has seleccionado {selectedUnits} unidad{selectedUnits !== 1 ? "es" : ""} para lavar.
-                </p>
-              )}
             </section>
 
             <div className="space-y-4">

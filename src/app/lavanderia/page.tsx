@@ -56,9 +56,6 @@ export default function LavanderiaPage() {
             </span>
             <div>
               <h1 className="text-[32px] font-black tracking-tight text-white">Lavandería</h1>
-              <p className="mt-1 max-w-[16rem] text-sm leading-relaxed text-slate-300">
-                Revisa lo que está fuera y marca cada prenda cuando vuelva limpia al armario.
-              </p>
             </div>
           </div>
 
@@ -122,14 +119,18 @@ export default function LavanderiaPage() {
                         e.stopPropagation();
                         handleReceiveOne(prenda.id);
                       }}
-                      className="flex w-full items-center justify-center gap-1 rounded-2xl border border-emerald-400/20 bg-emerald-500/12 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-200 transition-all active:scale-[0.98]"
+                      className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-black/20 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/90 backdrop-blur-md transition-all active:scale-[0.96]"
                     >
-                      <CheckCircle2 size={12} />
+                      <CheckCircle2 size={13} />
                       Recibida
                     </button>
                   }
                 >
-                  {prenda.fechaEnvio && <TimeAgoText timestamp={prenda.fechaEnvio} />}
+                  {prenda.fechaEnvio && (
+                    <div className="mt-1 flex items-center justify-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/80">
+                      <TimeAgoText timestamp={prenda.fechaEnvio} />
+                    </div>
+                  )}
                 </PrendaCard>
               ))}
             </div>

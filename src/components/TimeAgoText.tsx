@@ -27,8 +27,8 @@ export default function TimeAgoText({ timestamp }: { timestamp: number }) {
   if (!text) return null;
 
   return (
-    <p className="text-xs text-[var(--color-laundry-alert)] font-medium mt-1">
+    <span className="opacity-90">
       {text}
-    </p>
+    </span>
   );
 }

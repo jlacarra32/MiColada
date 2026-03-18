@@ -102,7 +102,7 @@ export const TransparentIcon = ({ src, alt, className }: TransparentIconProps) =
         <img 
           src={processedSrc} 
           alt={alt} 
-          className="w-full h-full object-contain scale-110 drop-shadow-md"
+          className="w-full h-full object-contain drop-shadow-md"
         />
       ) : (
         <div className="w-full h-full bg-white/10 animate-pulse rounded-full" />

@@ -59,7 +59,7 @@ export default function PrendaCard({
         borderColor: colorStyle.border || "rgba(255,255,255,0.1)",
       }}
       className={clsx(
-        "group/card relative flex flex-col items-center overflow-hidden rounded-[28px] border text-center transition-all duration-300 ease-out",
+        "group/card relative flex flex-col items-center overflow-hidden rounded-[28px] border text-center transition-[transform,border-color,box-shadow,background-color] duration-300 ease-out",
         compact ? "gap-1 p-3" : "gap-1.5 p-4",
         onClick && "cursor-pointer active:scale-[0.985]",
         selected ? "ring-2 ring-cyan-300/90 shadow-[0_12px_28px_rgba(34,211,238,0.24)]" : "shadow-[0_10px_24px_rgba(0,0,0,0.14)]",

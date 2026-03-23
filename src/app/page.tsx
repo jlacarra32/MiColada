@@ -211,14 +211,12 @@ export default function ArmarioPage() {
                       {groupedPrendas[tipoKey].length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {groupedPrendas[tipoKey].map((prenda) => (
                       <PrendaCard
                         key={prenda.id}
                         prenda={prenda}
                         compact
-                        smallPreviewIcon
-                        hideTipoLabel
                         selected={isSelected(prenda.id)}
                         selectedQty={getQty(prenda.id)}
                         onClick={() => toggleSelection(prenda.id)}

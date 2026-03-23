@@ -137,13 +137,11 @@ function SearchPageContent() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {filteredPrendas.map((prenda) => (
               <PrendaCard
                 key={prenda.id}
                 compact
-                smallPreviewIcon
-                hideTipoLabel
                 prenda={prenda}
                 actionButton={
                   <button
@@ -152,26 +150,26 @@ function SearchPageContent() {
                       e.stopPropagation();
                       setPendingDelete(prenda);
                     }}
-                    className="flex w-full items-center justify-center gap-1 rounded-xl border border-red-400/18 bg-red-500/10 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-red-300 transition-all active:scale-[0.98]"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-red-400/18 bg-red-500/10 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-red-300 transition-all active:scale-[0.98]"
                   >
-                    <Trash2 size={11} />
-                    Borrar
+                    <Trash2 size={12} />
+                    Eliminar
                   </button>
                 }
               >
                 <div
                   className={clsx(
-                    "mt-0.5 flex items-center justify-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em]",
+                    "mt-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em]",
                     prenda.estado === "en_lavanderia" ? "bg-emerald-400/12 text-emerald-200" : "bg-cyan-400/12 text-cyan-200"
                   )}
                 >
                   <span
                     className={clsx(
-                      "h-1 w-1 rounded-full",
+                      "h-1.5 w-1.5 rounded-full",
                       prenda.estado === "en_lavanderia" ? "bg-emerald-300" : "bg-cyan-300"
                     )}
                   />
-                  {prenda.estado === "en_lavanderia" ? "Lava" : "Armario"}
+                  {prenda.estado === "en_lavanderia" ? "En lavandería" : "En armario"}
                 </div>
               </PrendaCard>
             ))}

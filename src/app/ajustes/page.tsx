@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Plus, X, ArrowLeft } from "lucide-react";
 import { useConfig } from "@/hooks/useConfig";
 import { getColorName, getColorStyle } from "@/utils/colors";
@@ -29,6 +30,9 @@ const SPANISH_COLORS: Record<string, string> = {
 
 export default function ConfigPage() {
   const { tipos, colores, isLoaded, addTipo, removeTipo, addColor, removeColor } = useConfig();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const backHref = from === "lavanderia" ? "/lavanderia" : from === "inicio" ? "/inicio" : "/";
 
   const [newTipo, setNewTipo] = useState("");
   const [newColor, setNewColor] = useState("");
@@ -65,8 +69,8 @@ export default function ConfigPage() {
       <div className="min-h-full px-4 pb-36 pt-5">
         <header className="mb-5 flex items-start gap-3">
           <Link
-            href="/"
-            aria-label="Volver al armario"
+            href={backHref}
+            aria-label="Volver"
             className="mt-1 rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
           >
             <ArrowLeft size={20} />

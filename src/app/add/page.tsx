@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Package, PlusCircle } from "lucide-react";
 import { usePrendas } from "@/hooks/usePrendas";
 import { isBagType, useConfig } from "@/hooks/useConfig";
@@ -12,6 +12,9 @@ import { getEmojiForTipo } from "@/utils/icons";
 
 export default function AddPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const backHref = from === "inicio" ? "/inicio" : "/";
   const { addPrenda } = usePrendas();
   const { tipos, colores, isLoaded } = useConfig();
 
@@ -33,7 +36,7 @@ export default function AddPage() {
       detalle: detalle.trim(),
       ...(esMultiple ? { esMultiple: true } : {}),
     });
-    router.push("/");
+    router.push(backHref);
   };
 
   const isFormValid = tipo.length > 0 && color.length > 0;
@@ -46,8 +49,8 @@ export default function AddPage() {
     <div className="min-h-full px-4 pb-40 pt-5">
       <header className="mb-5 flex items-start gap-3">
         <Link
-          href="/"
-          aria-label="Volver al armario"
+          href={backHref}
+          aria-label="Volver"
           className="mt-1 rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
         >
           <ArrowLeft size={20} />

@@ -132,14 +132,14 @@ export default function ArmarioPage() {
 
           <div className="flex gap-2 pt-1">
             <Link
-              href="/buscar"
+              href="/buscar?from=armario"
               aria-label="Buscar prendas"
               className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
             >
               <Search size={20} strokeWidth={2.4} />
             </Link>
             <Link
-              href="/ajustes"
+              href="/ajustes?from=armario"
               aria-label="Abrir ajustes"
               className="rounded-2xl border border-cyan-200/20 bg-cyan-400/12 p-3 text-cyan-100 shadow-[0_12px_26px_rgba(34,211,238,0.18)] transition-all active:scale-95"
             >
@@ -174,7 +174,7 @@ export default function ArmarioPage() {
               Añade ropa nueva o recupera prendas desde la lavandería para empezar a usar la app con ritmo.
             </p>
             <Link
-              href="/add"
+              href="/add?from=armario"
               className="mt-6 rounded-2xl border border-cyan-200/20 bg-gradient-to-r from-cyan-400 to-sky-500 px-5 py-3 font-bold text-white shadow-[0_14px_30px_rgba(34,211,238,0.28)] transition-all active:scale-95"
             >
               Añadir primera prenda
@@ -211,12 +211,14 @@ export default function ArmarioPage() {
                       {groupedPrendas[tipoKey].length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-2">
                     {groupedPrendas[tipoKey].map((prenda) => (
                       <PrendaCard
                         key={prenda.id}
                         prenda={prenda}
                         compact
+                        smallPreviewIcon
+                        hideTipoLabel
                         selected={isSelected(prenda.id)}
                         selectedQty={getQty(prenda.id)}
                         onClick={() => toggleSelection(prenda.id)}

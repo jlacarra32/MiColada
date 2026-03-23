@@ -79,7 +79,7 @@ export default function InicioPage() {
         {/* Quick actions */}
         <section className="mb-5 grid grid-cols-2 gap-3">
           <Link
-            href="/add"
+            href="/add?from=inicio"
             className="flex flex-col items-center gap-2 rounded-[24px] border border-cyan-200/20 bg-gradient-to-br from-cyan-400/20 to-sky-500/10 px-4 py-4 text-center transition-all active:scale-[0.97]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-sky-500 text-white shadow-[0_8px_20px_rgba(34,211,238,0.3)]">
@@ -89,7 +89,7 @@ export default function InicioPage() {
           </Link>
 
           <Link
-            href="/ajustes"
+            href="/ajustes?from=inicio"
             className="flex flex-col items-center gap-2 rounded-[24px] border border-white/10 bg-white/6 px-4 py-4 text-center transition-all active:scale-[0.97]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-zinc-200">
@@ -123,27 +123,29 @@ export default function InicioPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {lavanderiaPrendas.map((prenda) => (
               <PrendaCard
                 key={prenda.id}
                 prenda={prenda}
                 compact
+                smallPreviewIcon
+                hideTipoLabel
                 actionButton={
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleReceiveOne(prenda.id);
                     }}
-                    className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-black/20 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/90 backdrop-blur-md transition-all active:scale-[0.96]"
+                    className="mt-1 flex w-full items-center justify-center gap-1 rounded-xl bg-black/20 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/90 backdrop-blur-md transition-all active:scale-[0.96]"
                   >
-                    <CheckCircle2 size={13} />
-                    Recibida
+                    <CheckCircle2 size={11} />
+                    OK
                   </button>
                 }
               >
                 {prenda.fechaEnvio && (
-                  <div className="mt-1 flex items-center justify-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/80">
+                  <div className="mt-0.5 flex items-center justify-center gap-1 rounded-full bg-black/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-white/70">
                     <TimeAgoText timestamp={prenda.fechaEnvio} />
                   </div>
                 )}

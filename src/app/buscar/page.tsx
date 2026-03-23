@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { ArrowLeft, Search, Trash2, X } from "lucide-react";
 import { usePrendas } from "@/hooks/usePrendas";
@@ -13,6 +14,9 @@ type StatusFilter = "all" | "armario" | "lavanderia";
 
 export default function SearchPage() {
   const { prendas, isLoaded, removePrenda } = usePrendas();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const backHref = from === "lavanderia" ? "/lavanderia" : from === "inicio" ? "/inicio" : "/";
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [pendingDelete, setPendingDelete] = useState<Prenda | null>(null);
@@ -49,8 +53,8 @@ export default function SearchPage() {
       <div className="min-h-full px-4 pb-36 pt-5">
         <header className="mb-5 flex items-center gap-3">
           <Link
-            href="/"
-            aria-label="Volver al armario"
+            href={backHref}
+            aria-label="Volver"
             className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
           >
             <ArrowLeft size={20} />
@@ -125,11 +129,13 @@ export default function SearchPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {filteredPrendas.map((prenda) => (
               <PrendaCard
                 key={prenda.id}
                 compact
+                smallPreviewIcon
+                hideTipoLabel
                 prenda={prenda}
                 actionButton={
                   <button
@@ -138,26 +144,26 @@ export default function SearchPage() {
                       e.stopPropagation();
                       setPendingDelete(prenda);
                     }}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-red-400/18 bg-red-500/10 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-red-300 transition-all active:scale-[0.98]"
+                    className="flex w-full items-center justify-center gap-1 rounded-xl border border-red-400/18 bg-red-500/10 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-red-300 transition-all active:scale-[0.98]"
                   >
-                    <Trash2 size={12} />
-                    Eliminar
+                    <Trash2 size={11} />
+                    Borrar
                   </button>
                 }
               >
                 <div
                   className={clsx(
-                    "mt-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em]",
+                    "mt-0.5 flex items-center justify-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em]",
                     prenda.estado === "en_lavanderia" ? "bg-emerald-400/12 text-emerald-200" : "bg-cyan-400/12 text-cyan-200"
                   )}
                 >
                   <span
                     className={clsx(
-                      "h-1.5 w-1.5 rounded-full",
+                      "h-1 w-1 rounded-full",
                       prenda.estado === "en_lavanderia" ? "bg-emerald-300" : "bg-cyan-300"
                     )}
                   />
-                  {prenda.estado === "en_lavanderia" ? "En lavandería" : "En armario"}
+                  {prenda.estado === "en_lavanderia" ? "Lava" : "Armario"}
                 </div>
               </PrendaCard>
             ))}

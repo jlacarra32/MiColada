@@ -61,14 +61,14 @@ export default function LavanderiaPage() {
 
           <div className="flex gap-2 pt-1">
             <Link
-              href="/buscar"
+              href="/buscar?from=lavanderia"
               aria-label="Buscar prendas"
               className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
             >
               <Search size={20} strokeWidth={2.4} />
             </Link>
             <Link
-              href="/ajustes"
+              href="/ajustes?from=lavanderia"
               aria-label="Abrir ajustes"
               className="rounded-2xl border border-cyan-200/20 bg-cyan-400/12 p-3 text-cyan-100 shadow-[0_12px_26px_rgba(34,211,238,0.18)] transition-all active:scale-95"
             >
@@ -107,27 +107,29 @@ export default function LavanderiaPage() {
               </div>
             </section>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {lavanderiaPrendas.map((prenda) => (
                 <PrendaCard
                   key={prenda.id}
                   prenda={prenda}
                   compact
+                  smallPreviewIcon
+                  hideTipoLabel
                   actionButton={
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleReceiveOne(prenda.id);
                       }}
-                      className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-black/20 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/90 backdrop-blur-md transition-all active:scale-[0.96]"
+                      className="mt-1 flex w-full items-center justify-center gap-1 rounded-xl bg-black/20 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/90 backdrop-blur-md transition-all active:scale-[0.96]"
                     >
-                      <CheckCircle2 size={13} />
-                      Recibida
+                      <CheckCircle2 size={11} />
+                      OK
                     </button>
                   }
                 >
                   {prenda.fechaEnvio && (
-                    <div className="mt-1 flex items-center justify-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/80">
+                    <div className="mt-0.5 flex items-center justify-center gap-1 rounded-full bg-black/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-white/70">
                       <TimeAgoText timestamp={prenda.fechaEnvio} />
                     </div>
                   )}

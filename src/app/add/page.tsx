@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Package, PlusCircle } from "lucide-react";
@@ -11,6 +11,14 @@ import { getColorName, getColorStyle } from "@/utils/colors";
 import { getEmojiForTipo } from "@/utils/icons";
 
 export default function AddPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[100dvh] p-8 text-center text-zinc-400">Cargando...</div>}>
+      <AddPageContent />
+    </Suspense>
+  );
+}
+
+function AddPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");

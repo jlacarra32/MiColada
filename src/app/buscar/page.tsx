@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
@@ -13,6 +13,14 @@ import { Prenda } from "@/types";
 type StatusFilter = "all" | "armario" | "lavanderia";
 
 export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[100dvh] p-8 text-center text-zinc-400">Cargando búsqueda...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
+}
+
+function SearchPageContent() {
   const { prendas, isLoaded, removePrenda } = usePrendas();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");

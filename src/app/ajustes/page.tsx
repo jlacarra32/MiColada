@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Plus, X, ArrowLeft } from "lucide-react";
@@ -29,6 +29,14 @@ const SPANISH_COLORS: Record<string, string> = {
 };
 
 export default function ConfigPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[100dvh] p-8 text-center text-zinc-400">Cargando ajustes...</div>}>
+      <ConfigPageContent />
+    </Suspense>
+  );
+}
+
+function ConfigPageContent() {
   const { tipos, colores, isLoaded, addTipo, removeTipo, addColor, removeColor } = useConfig();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");

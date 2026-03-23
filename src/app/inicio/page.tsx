@@ -7,17 +7,22 @@ import PrendaCard from "@/components/PrendaCard";
 import TimeAgoText from "@/components/TimeAgoText";
 import Toast from "@/components/Toast";
 import FAB from "@/components/FAB";
-import { Settings, PlusCircle, CheckCircle2, Waves, PackageCheck, WashingMachine, Shirt } from "lucide-react";
+import { Prenda } from "@/types";
+import { PlusCircle, Search, Settings, Shirt, WashingMachine, CheckCircle2, Waves, HelpCircle, PackageCheck } from "lucide-react";
+import clsx from "clsx";
 
 export default function InicioPage() {
   const { prendas, isLoaded, receiveFromLaundry, receiveManyFromLaundry } = usePrendas();
   const [toast, setToast] = useState({ visible: false, message: "" });
 
+  const armadaPrendas = useMemo(() => prendas.filter((p) => p.estado === "en_armario"), [prendas]);
   const lavanderiaPrendas = useMemo(
-    () =>
-      prendas
-        .filter((p) => p.estado === "en_lavanderia")
-        .sort((a, b) => (b.fechaEnvio || 0) - (a.fechaEnvio || 0)),
+    () => prendas.filter((p) => p.estado === "en_lavanderia").sort((a, b) => (b.fechaEnvio || 0) - (a.fechaEnvio || 0)),
+    [prendas]
+  );
+  
+  const perdidasPrendas = useMemo(
+    () => prendas.filter((p) => p.estado === "perdido"),
     [prendas]
   );
 
@@ -74,6 +79,15 @@ export default function InicioPage() {
             </div>
             <span className="text-[15px] font-black text-white tabular-nums">{lavanderiaPrendas.length}</span>
           </div>
+          {perdidasPrendas.length > 0 && (
+            <div className="col-span-2 flex items-center justify-between rounded-2xl border border-red-400/18 bg-red-400/10 px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <HelpCircle size={14} className="text-red-400" />
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-red-200/80">Perdidas</p>
+              </div>
+              <span className="text-[15px] font-black text-white tabular-nums">{perdidasPrendas.length}</span>
+            </div>
+          )}
         </section>
 
         {/* Quick actions */}

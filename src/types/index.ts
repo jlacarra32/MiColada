@@ -1,4 +1,4 @@
-export type EstadoPrenda = 'en_armario' | 'en_lavanderia';
+export type EstadoPrenda = 'en_armario' | 'en_lavanderia' | 'perdido';
 
 export interface Prenda {
   id: string;

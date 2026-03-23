@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Prenda } from "@/types";
@@ -21,8 +21,24 @@ export function usePrendas() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setPrendas(loadStoredPrendas());
+      let stored = loadStoredPrendas();
+      const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      let hasChanges = false;
+      
+      stored = stored.map((p) => {
+        if (p.estado === "en_lavanderia" && p.fechaEnvio && now - p.fechaEnvio > SEVEN_DAYS_MS) {
+          hasChanges = true;
+          return { ...p, estado: "perdido" };
+        }
+        return p;
+      });
+
+      setPrendas(stored);
       setIsLoaded(true);
+      if (hasChanges) {
+        localStorage.setItem("micolada_prendas", JSON.stringify(stored));
+      }
     }, 0);
 
     return () => window.clearTimeout(timer);
@@ -84,6 +100,18 @@ export function usePrendas() {
     setPrendas((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   };
 
+  const markAsLost = (id: string) => {
+    setPrendas((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, estado: "perdido" } : p))
+    );
+  };
+
+  const markAsFound = (id: string) => {
+    setPrendas((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, estado: "en_armario", fechaEnvio: undefined, cantidadEnviada: undefined } : p))
+    );
+  };
+
   const removePrenda = (id: string) => {
     setPrendas((prev) => prev.filter((p) => p.id !== id));
   };
@@ -95,6 +123,8 @@ export function usePrendas() {
     sendToLaundry,
     receiveFromLaundry,
     receiveManyFromLaundry,
+    markAsLost,
+    markAsFound,
     removePrenda,
     updatePrenda,
   };

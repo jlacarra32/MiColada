@@ -1,6 +1,6 @@
 "use client";
 import { Prenda } from "@/types";
-import { CheckCircle2, Minus, Plus } from "lucide-react";
+import { CheckCircle2, Minus, Plus, HelpCircle } from "lucide-react";
 import clsx from "clsx";
 import { getColorName, getColorStyle } from "@/utils/colors";
 import { getEmojiForTipo } from "@/utils/icons";
@@ -63,6 +63,7 @@ export default function PrendaCard({
         compact ? "gap-1 p-3" : "gap-1.5 p-4",
         onClick && "cursor-pointer active:scale-[0.985]",
         selected ? "ring-2 ring-cyan-300/90 shadow-[0_12px_28px_rgba(34,211,238,0.24)]" : "shadow-[0_10px_24px_rgba(0,0,0,0.14)]",
+        prenda.estado === "perdido" && "grayscale-[0.6] opacity-80 border-red-500/30",
         textColor
       )}
     >
@@ -80,6 +81,11 @@ export default function PrendaCard({
             {prenda.estado === "en_lavanderia" && (
               <div className="absolute -right-0.5 -top-0.5 z-20 rounded-full border-2 border-zinc-900 bg-emerald-500 p-0.5 text-white shadow-lg">
                 <CheckCircle2 size={9} strokeWidth={3} />
+              </div>
+            )}
+            {prenda.estado === "perdido" && (
+              <div className="absolute -right-0.5 -top-0.5 z-20 rounded-full border-2 border-zinc-900 bg-red-500 p-0.5 text-white shadow-lg">
+                <HelpCircle size={9} strokeWidth={3} />
               </div>
             )}
           </div>

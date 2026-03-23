@@ -40,7 +40,8 @@ function SearchPageContent() {
       const matchesStatus =
         statusFilter === "all" ||
         (statusFilter === "armario" && prenda.estado === "en_armario") ||
-        (statusFilter === "lavanderia" && prenda.estado === "en_lavanderia");
+        (statusFilter === "lavanderia" && prenda.estado === "en_lavanderia") ||
+        (statusFilter === "lavanderia" && prenda.estado === "perdido");
 
       return matchesQuery && matchesStatus;
     });
@@ -160,16 +161,16 @@ function SearchPageContent() {
                 <div
                   className={clsx(
                     "mt-1 flex items-center justify-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em]",
-                    prenda.estado === "en_lavanderia" ? "bg-emerald-400/12 text-emerald-200" : "bg-cyan-400/12 text-cyan-200"
+                    prenda.estado === "en_lavanderia" ? "bg-emerald-400/12 text-emerald-200" : prenda.estado === "perdido" ? "bg-red-500/10 text-red-300" : "bg-cyan-400/12 text-cyan-200"
                   )}
                 >
                   <span
                     className={clsx(
                       "h-1.5 w-1.5 rounded-full",
-                      prenda.estado === "en_lavanderia" ? "bg-emerald-300" : "bg-cyan-300"
+                      prenda.estado === "en_lavanderia" ? "bg-emerald-300" : prenda.estado === "perdido" ? "bg-red-400" : "bg-cyan-300"
                     )}
                   />
-                  {prenda.estado === "en_lavanderia" ? "En lavandería" : "En armario"}
+                  {prenda.estado === "en_lavanderia" ? "En lavandería" : prenda.estado === "perdido" ? "Perdida" : "En armario"}
                 </div>
               </PrendaCard>
             ))}

@@ -91,7 +91,7 @@ export default function PrendaCard({
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col items-start justify-center">
-            <h3 className={clsx("w-full truncate text-left leading-tight", compact ? "text-[13px] font-bold" : "text-[15px] font-bold")}>
+            <h3 className={clsx("w-full truncate text-left leading-tight", compact ? "text-[15px] font-bold" : "text-[17px] font-bold")}>
               {title}
             </h3>
 

@@ -58,45 +58,42 @@ export default function LavanderiaPage() {
   return (
     <>
       <div className="min-h-full px-4 pb-24 pt-5">
-        <header className="mb-5 flex items-start justify-between gap-4">
-          <div className="space-y-3">
-            <div className="flex bg-black/30 rounded-full p-1 border border-white/5">
-              <button
-                onClick={() => setViewMode("lavanderia")}
-                className={clsx("px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.14em] transition-all", viewMode === "lavanderia" ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/20" : "text-zinc-500 hover:text-white")}
+        <header className="mb-5">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-[32px] font-black tracking-tight text-white">
+              {viewMode === "lavanderia" ? "Lavandería" : "Perdidas"}
+            </h1>
+            <div className="flex gap-2">
+              <Link
+                href="/buscar?from=lavanderia"
+                aria-label="Buscar prendas"
+                className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
               >
-                Lavandería
-              </button>
-              <button
-                onClick={() => setViewMode("perdidos")}
-                className={clsx("px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.14em] transition-all flex items-center gap-1.5", viewMode === "perdidos" ? "bg-red-400/20 text-red-300 border border-red-400/20" : "text-zinc-500 hover:text-white")}
+                <Search size={20} strokeWidth={2.4} />
+              </Link>
+              <Link
+                href="/ajustes?from=lavanderia"
+                aria-label="Abrir ajustes"
+                className="rounded-2xl border border-cyan-200/20 bg-cyan-400/12 p-3 text-cyan-100 shadow-[0_12px_26px_rgba(34,211,238,0.18)] transition-all active:scale-95"
               >
-                Perdidos
-                {perdidasPrendas.length > 0 && <span className="bg-red-500/20 text-red-400 px-1.5 rounded-full min-w-[18px] text-center">{perdidasPrendas.length}</span>}
-              </button>
-            </div>
-            <div>
-              <h1 className="text-[32px] font-black tracking-tight text-white">
-                {viewMode === "lavanderia" ? "Lavandería" : "Ropa Perdida"}
-              </h1>
+                <Settings size={20} strokeWidth={2.4} />
+              </Link>
             </div>
           </div>
-
-          <div className="flex gap-2 pt-1">
-            <Link
-              href="/buscar?from=lavanderia"
-              aria-label="Buscar prendas"
-              className="rounded-2xl border border-white/10 bg-white/8 p-3 text-zinc-200 transition-all active:scale-95"
+          <div className="mt-3 flex bg-black/30 rounded-full p-1 border border-white/5 w-fit">
+            <button
+              onClick={() => setViewMode("lavanderia")}
+              className={clsx("px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.14em] transition-all", viewMode === "lavanderia" ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/20" : "text-zinc-500 hover:text-white")}
             >
-              <Search size={20} strokeWidth={2.4} />
-            </Link>
-            <Link
-              href="/ajustes?from=lavanderia"
-              aria-label="Abrir ajustes"
-              className="rounded-2xl border border-cyan-200/20 bg-cyan-400/12 p-3 text-cyan-100 shadow-[0_12px_26px_rgba(34,211,238,0.18)] transition-all active:scale-95"
+              Lavandería
+            </button>
+            <button
+              onClick={() => setViewMode("perdidos")}
+              className={clsx("px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.14em] transition-all flex items-center gap-1.5", viewMode === "perdidos" ? "bg-red-400/20 text-red-300 border border-red-400/20" : "text-zinc-500 hover:text-white")}
             >
-              <Settings size={20} strokeWidth={2.4} />
-            </Link>
+              Perdidas
+              {perdidasPrendas.length > 0 && <span className="bg-red-500/20 text-red-400 px-1.5 rounded-full min-w-[18px] text-center">{perdidasPrendas.length}</span>}
+            </button>
           </div>
         </header>
 

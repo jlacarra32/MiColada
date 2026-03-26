@@ -1,11 +1,30 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "MiColada | Armario de lavandería",
   description: "Gestiona tu ropa limpia y tu colada desde el móvil",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MiColada",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-512.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#061728",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -22,6 +41,7 @@ export default function RootLayout({
           <div className="pointer-events-none absolute -left-12 top-72 h-44 w-44 rounded-full bg-emerald-400/8 blur-3xl" />
           <div className="relative min-h-[100dvh] pb-28">{children}</div>
           <BottomNav />
+          <ServiceWorkerRegistrar />
           <Analytics />
         </div>
       </body>

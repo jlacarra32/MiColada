@@ -9,7 +9,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Armario", href: "/", icon: Shirt },
+    { label: "Armario", href: "/armario", icon: Shirt },
     { label: "Inicio", href: "/inicio", icon: Home },
     { label: "Lavandería", href: "/lavanderia", icon: WashingMachine },
   ];

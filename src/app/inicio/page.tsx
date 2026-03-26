@@ -81,7 +81,7 @@ export default function InicioPage() {
       </div>
       <section className="grid grid-cols-2 gap-3">
         <Link
-          href="/"
+          href="/armario"
           className="flex flex-col items-center gap-3 rounded-[24px] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/18 to-sky-600/10 px-4 py-5 text-center transition-all active:scale-[0.97]"
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/20 text-cyan-200 shadow-[0_8px_24px_rgba(34,211,238,0.18)]">
